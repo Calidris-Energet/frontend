@@ -1,11 +1,9 @@
 import react from "@vitejs/plugin-react";
-import { loadEnv } from "vite";
+import { loadEnv, ConfigEnv } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-export default ({ mode }) => {
+export default ({ mode }: ConfigEnv) => {
     process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
 
     return defineConfig({

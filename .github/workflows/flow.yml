@@ -1,0 +1,409 @@
+name: Deploy Frontend
+
+on: [push, pull_request]
+
+env:
+  TELEGRAM_GROUP_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+  TELEGRAM_TOPIC_ID: ${{ secrets.TELEGRAM_TOPIC_ID }}
+  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  notify-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify github action on Telegram
+        uses: EverythingSuckz/github-telegram-notify@main
+        with:
+          bot_token: '${{ secrets.TELEGRAM_TOKEN }}'
+          chat_id: '${{ secrets.TELEGRAM_CHAT_ID }}'
+          topic_id: '${{ secrets.TELEGRAM_TOPIC_ID }}'
+
+  install-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Commit
+        uses: actions/checkout@master
+
+      - name: Установка Node.js
+        uses: actions/setup-node@master
+        with:
+          node-version: 23
+
+      - name: Cache npm dependencies
+        uses: actions/cache@master
+        id: cache-dependencies
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install Dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: |
+          npm ci
+
+      - name: Get Current Job Log URL
+        uses: Tiryoh/gha-jobid-action@main
+        if: failure()
+        id: jobs
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          job_name: ${{ github.job }}
+
+      - name: Send Telegram Error Message
+        if: failure()
+        uses: PacificPromise/macos-telegram-action@main
+        with:
+          type: topic
+          message: |
+            ❗ Произошла ошибка во время установки зависимостей ❗
+            
+            🔹 Repo: ${{ github.repository }}
+            🔹 Workflow: ${{ github.workflow }}
+            🔹 Job: ${{ github.job }}
+            
+            🔗 Ссылка на джобу 🔗
+            ${{ steps.jobs.outputs.html_url }}
+            
+            🔗 Ссылка на пайплайн 🔗
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: install-cache
+    steps:
+      - name: Checkout Commit
+        uses: actions/checkout@master
+
+      - name: Установка Node.js
+        uses: actions/setup-node@master
+        with:
+          node-version: 23
+
+      - name: Restore npm dependencies
+        uses: actions/cache@master
+        id: cache-dependencies
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Прогон линтера
+        run: npm run lint
+
+      - name: Get Current Job Log URL
+        uses: Tiryoh/gha-jobid-action@main
+        if: failure()
+        id: jobs
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          job_name: ${{ github.job }}
+
+      - name: Send Telegram Error Message
+        if: failure()
+        uses: PacificPromise/macos-telegram-action@main
+        with:
+          type: topic
+          message: |
+            ❗ Произошла ошибка во время прогона линтера ❗
+            
+            🔹 Repo: ${{ github.repository }}
+            🔹 Workflow: ${{ github.workflow }}
+            🔹 Job: ${{ github.job }}
+            
+            🔗 Ссылка на джобу 🔗
+            ${{ steps.jobs.outputs.html_url }}
+            
+            🔗 Ссылка на пайплайн 🔗
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+  unit-test:
+    runs-on: ubuntu-latest
+    needs: install-cache
+
+    permissions:
+      # Required to checkout the code
+      contents: read
+      # Required to put a comment into the pull-request
+      pull-requests: write
+
+    steps:
+      - name: Checkout Commit
+        uses: actions/checkout@v2
+
+      - name: Установка Node.js
+        uses: actions/setup-node@master
+        with:
+          node-version: 23
+
+      - name: Restore npm dependencies
+        uses: actions/cache@master
+        id: cache-dependencies
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Прогон тестов
+        run: npx vitest --coverage.enabled true
+
+      - name: 'Report Coverage'
+        # Set if: always() to also generate the report if tests are failing
+        # Only works if you set `reportOnFailure: true` in your vite config as specified above
+        if: always()
+        uses:  davelosert/vitest-coverage-report-action@v2
+
+      - name: Get Current Job Log URL
+        uses: Tiryoh/gha-jobid-action@main
+        if: failure()
+        id: jobs
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          job_name: ${{ github.job }}
+
+      - name: Send Telegram Error Message
+        if: failure()
+        uses: PacificPromise/macos-telegram-action@main
+        with:
+          type: topic
+          message: |
+            ❗ Произошла ошибка во время прогона юнит тестов ❗
+            
+            🔹 Repo: ${{ github.repository }}
+            🔹 Workflow: ${{ github.workflow }}
+            🔹 Job: ${{ github.job }}
+            
+            🔗 Ссылка на джобу 🔗
+            ${{ steps.jobs.outputs.html_url }}
+            
+            🔗 Ссылка на пайплайн 🔗
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull code
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_PORT }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: cd /home/energet/frontend && git checkout ${{ github.ref_name }} && git pull
+
+      - name: Build frontend
+        uses: appleboy/ssh-action@master
+        with:
+          timeout: 10m
+          host: ${{ secrets.SERVER_PORT }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: cd /home/energet/frontend/ && npm run build
+
+#  build:
+#    runs-on: ubuntu-latest
+#    needs: [ install-cache, lint, unit-test ]
+#    steps:
+#      - name: Checkout репозитория
+#        uses: actions/checkout@master
+#
+#      - name: Установка Node.js
+#        uses: actions/setup-node@master
+#        with:
+#          node-version: 23
+#
+#      - name: Restore npm dependencies
+#        uses: actions/cache@master
+#        id: cache-dependencies
+#        with:
+#          path: node_modules
+#          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+#          restore-keys: |
+#            ${{ runner.os }}-npm-
+#
+#      - name: Make envfile
+#        uses: SpicyPizza/create-envfile@v2.0
+#        with:
+#          envkey_VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+#          envkey_VITE_SENTRY_ENABLED: ${{ secrets.VITE_SENTRY_ENABLED }}
+#          envkey_VITE_VK_SDK_APP_ID: ${{ secrets.VITE_VK_SDK_APP_ID }}
+#          envkey_VITE_VK_ID_REDIRECT_URL: ${{ secrets.VITE_VK_ID_REDIRECT_URL }}
+#          envkey_VITE_YMAPS_API_KEY: ${{ secrets.VITE_YMAPS_API_KEY }}
+#          directory: .
+#          file_name: .env.production
+#          fail_on_empty: false
+#          sort_keys: false
+#
+#      - name: Сборка проекта
+#        run: npm run build
+#
+#      - name: Upload build artifacts
+#        uses: actions/upload-artifact@main
+#        with:
+#          name: build-output
+#          path: dist
+#          retention-days: 1
+#
+#      - name: Upload static artifacts
+#        uses: actions/upload-artifact@main
+#        with:
+#          name: build-output2
+#          path: public
+#          retention-days: 1
+#
+#      - name: Get Current Job Log URL
+#        uses: Tiryoh/gha-jobid-action@main
+#        if: failure()
+#        id: jobs
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          job_name: ${{ github.job }}
+#
+#      - name: Send Telegram Error Message
+#        if: failure()
+#        uses: PacificPromise/macos-telegram-action@main
+#        with:
+#          type: topic
+#          message: |
+#            ❗ Произошла ошибка во время сборки ❗
+#
+#            🔹 Repo: ${{ github.repository }}
+#            🔹 Workflow: ${{ github.workflow }}
+#            🔹 Job: ${{ github.job }}
+#
+#            🔗 Ссылка на джобу 🔗
+#            ${{ steps.jobs.outputs.html_url }}
+#
+#            🔗 Ссылка на пайплайн 🔗
+#            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+#  deployS3:
+#    runs-on: ubuntu-latest
+#    needs: build
+#    steps:
+#      - name: Download build artifacts
+#        uses: actions/download-artifact@main
+#        with:
+#          name: build-output2
+#          path: static
+#
+#      - name: Deploy static folder to S3 bucket
+#        uses: jakejarvis/s3-sync-action@master
+#        with:
+#          args: --acl public-read --follow-symlinks --delete --no-verify-ssl
+#        env:
+#          AWS_S3_ENDPOINT: ${{secrets.AWS_S3_ENDPOINT}}
+#          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          AWS_REGION: 'ru-7'
+#          SOURCE_DIR: 'static'
+#
+#      - name: Get Current Job Log URL
+#        uses: Tiryoh/gha-jobid-action@main
+#        if: failure()
+#        id: jobs
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          job_name: ${{ github.job }}
+#
+#      - name: Send Telegram Error Message
+#        if: failure()
+#        uses: PacificPromise/macos-telegram-action@main
+#        with:
+#          type: topic
+#          message: |
+#            ❗ Произошла ошибка во время деплоя в S3 ❗
+#
+#            🔹 Repo: ${{ github.repository }}
+#            🔹 Workflow: ${{ github.workflow }}
+#            🔹 Job: ${{ github.job }}
+#
+#            🔗 Ссылка на джобу 🔗
+#            ${{ steps.jobs.outputs.html_url }}
+#
+#            🔗 Ссылка на пайплайн 🔗
+#            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+#  deploy:
+#    runs-on: ubuntu-latest
+#    needs: build
+#    steps:
+#      - name: Download build artifacts
+#        uses: actions/download-artifact@main
+#        with:
+#          name: build-output
+#          path: dist
+#
+#      - name: Очистка папки на сервере
+#        uses: appleboy/ssh-action@master
+#        with:
+#          timeout: 10m
+#          port: ${{ secrets.SERVER_PORT }}
+#          host: ${{ secrets.SERVER_HOST }}
+#          username: ${{ secrets.SERVER_USER }}
+#          key: ${{ secrets.SERVER_SSH_KEY }}
+#          script: sudo rm -rf /home/energet/energet-frontend/dist/*
+#
+#      - name: Деплой на сервер
+#        uses: appleboy/scp-action@master
+#        with:
+#          port: ${{ secrets.SERVER_PORT }}
+#          host: ${{ secrets.SERVER_HOST }}
+#          username: ${{ secrets.SERVER_USER }}
+#          key: ${{ secrets.SERVER_SSH_KEY }}
+#          source: dist/*
+#          target: "/home/energet/energet-frontend/dist"
+#          strip_components: 1
+#          overwrite: true
+#
+#      - name: Get Current Job Log URL
+#        uses: Tiryoh/gha-jobid-action@main
+#        if: failure()
+#        id: jobs
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          job_name: ${{ github.job }}
+#
+#      - name: Send Telegram Error Message
+#        if: failure()
+#        uses: PacificPromise/macos-telegram-action@main
+#        with:
+#          type: topic
+#          message: |
+#            ❗ Произошла ошибка во время деплоя ❗
+#
+#            🔹 Repo: ${{ github.repository }}
+#            🔹 Workflow: ${{ github.workflow }}
+#            🔹 Job: ${{ github.job }}
+#
+#            🔗 Ссылка на джобу 🔗
+#            ${{ steps.jobs.outputs.html_url }}
+#
+#            🔗 Ссылка на пайплайн 🔗
+#            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+
+
+
+  notify-success:
+    runs-on: ubuntu-latest
+#    needs: [deploy, deployS3]
+    needs: [deploy]
+    steps:
+      - name: Send Telegram Success Message
+        uses: PacificPromise/macos-telegram-action@main
+        with:
+          type: topic
+          message: |
+            ✅ Изменения успешно задеплоены ✅
+
+            🔗 Ссылка на прод 🔗
+            ${{ secrets.PRODUCTION_URL || 'Отсутствует' }}
