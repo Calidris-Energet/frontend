@@ -7,12 +7,6 @@ import { BrowserRouter } from "react-router-dom";
 import { StoreProvider } from "src/app/providers/StoreProvider";
 import App from "./app/App.tsx";
 
-console.log("import.meta.env", import.meta.env);
-console.log(
-    "import.meta.env.VITE_VK_SDK_APP_ID",
-    import.meta.env.VITE_VK_SDK_APP_ID
-);
-
 VKID.Config.init({
     app: import.meta.env.VITE_VK_SDK_APP_ID,
     redirectUrl: import.meta.env.VITE_VK_ID_REDIRECT_URL,
