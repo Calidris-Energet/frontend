@@ -192,6 +192,7 @@ jobs:
             cd /home/energet/frontend && 
             git fetch && 
             echo '${{ github.ref_name }}'
+            echo '${{ github.ref_name }}'
             git checkout ${{ github.ref_name }} && 
             git pull
 
