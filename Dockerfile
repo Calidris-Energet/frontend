@@ -13,7 +13,7 @@ RUN npm run build
 #базовый образ
 FROM nginx:alpine
 
-COPY --from=build /app/build/ /build
+COPY --from=build /app/dist/ /dist
 
 COPY default.conf /etc/nginx/conf.d/default.conf
 
