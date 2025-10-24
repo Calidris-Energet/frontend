@@ -207,8 +207,8 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd /home/energet/frontend/
-            docker build -t my-app:latest .
-            docker run --rm -d --network host my-app:latest
+            sudo docker build -t my-app:latest .
+            sudo docker run --rm -d --network host my-app:latest
 
   notify-success:
     runs-on: ubuntu-latest
