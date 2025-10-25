@@ -208,7 +208,7 @@ jobs:
           script: |
             cd /home/energet/frontend/
             sudo docker build -t my-app .
-            sudo docker run --rm -d --network host my-app
+            sudo docker run --rm -d --network host --volume /etc/letsencrypt/live/energet.shop:/ssl my-app
 
   notify-success:
     runs-on: ubuntu-latest
