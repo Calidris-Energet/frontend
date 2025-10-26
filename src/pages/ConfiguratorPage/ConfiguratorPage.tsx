@@ -10,7 +10,10 @@ import {
     StepButton,
     Stepper,
     Typography,
+    IconButton,
+    Tooltip,
 } from "@mui/material";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import {
     calculateFetch,
     resetConfigurator,
@@ -28,7 +31,24 @@ import { Optimization } from "src/widgets/Optimization/Optimization.tsx";
 import { TabPanel } from "src/widgets/TabPanel/TabPanel.tsx";
 
 export const ConfiguratorPage = () => {
-    const steps = ["Локация", "Потребление", "Оптимизация", "Результат"];
+    const steps = [
+        { 
+            label: "Локация", 
+            tooltip: "В разработке. Здесь вы можете выбрать местоположение для расчета." 
+        },
+        { 
+            label: "Потребление", 
+            tooltip: "В разработке. Здесь вы можете указать параметры энергопотребления." 
+        },
+        { 
+            label: "Оптимизация", 
+            tooltip: "В разработке. Здесь вы можете настроить параметры оптимизации системы." 
+        },
+        { 
+            label: "Результат", 
+            tooltip: "В разработке. Здесь вы можете просмотреть результаты расчета конфигурации." 
+        },
+    ];
 
     const [step, setStep] = useState(0);
 
@@ -127,21 +147,28 @@ export const ConfiguratorPage = () => {
             <Stack gap={10} width="100%">
                 <Box width="100%">
                     <Stepper nonLinear activeStep={step} width="100%">
-                        {steps.map((label, index) => {
+                        {steps.map((stepItem, index) => {
                             return (
-                                <Step key={label}>
-                                    <StepButton
-                                        onClick={() => handleStep(index)}
-                                    >
-                                        {label}
-                                    </StepButton>
+                                <Step key={stepItem.label}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <StepButton
+                                            onClick={() => handleStep(index)}
+                                        >
+                                            {stepItem.label}
+                                        </StepButton>
+                                        <Tooltip title={stepItem.tooltip} arrow placement="top">
+                                            <IconButton size="small" sx={{ ml: 0.5 }}>
+                                                <HelpOutlineIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Box>
                                 </Step>
                             );
                         })}
                     </Stepper>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
-                    <Box>
+                    <Box sx={{ position: 'relative', width: '100%' }}>
                         <TabPanel currentTab={step} index={0}>
                             <CoordsPicker />
                         </TabPanel>
