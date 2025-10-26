@@ -205,10 +205,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /home/energet/frontend/
-            sudo git fetch || exit 1
-            sudo git checkout ${{ github.ref_name }}
-            sudo git pull
+            cd /home/energet/frontend/ && 
             docker build -t my-app:latest .
             docker run --rm -d --network host my-app:latest
 
