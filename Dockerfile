@@ -11,12 +11,12 @@ COPY . .
 RUN npm run build
 
 #базовый образ
-#FROM nginx:alpine
-#
-#COPY --from=build /app/dist/ /dist
-#
-#COPY nginx.conf /etc/nginx/conf.d/default.conf
-#
-#EXPOSE 443
-#
-#CMD ["nginx", "-g", "daemon off;"]
+FROM nginx:alpine
+
+COPY --from=build /app/dist/ /dist
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 443
+
+CMD ["nginx", "-g", "daemon off;"]
