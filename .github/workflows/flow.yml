@@ -211,7 +211,7 @@ jobs:
             cd /home/energet/frontend/
             sudo docker container stop $CONTAINER_NAME
             sudo docker build -t $CONTAINER_NAME .
-            sudo docker run --rm -d --network host --volume /etc/letsencrypt/live/ssl:/ssl:ro $CONTAINER_NAME
+            sudo docker run --rm -d --network host --volume /etc/letsencrypt/live/ssl:/ssl $CONTAINER_NAME
 
   notify-success:
     runs-on: ubuntu-latest
