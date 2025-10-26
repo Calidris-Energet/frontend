@@ -9,7 +9,6 @@ env:
   TELEGRAM_GROUP_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
   TELEGRAM_TOPIC_ID: ${{ secrets.TELEGRAM_TOPIC_ID }}
   TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-  CONTAINER_NAME: "front"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -206,13 +205,10 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: CONTAINER_NAME
           script: |
             cd /home/energet/frontend/
-            sudo docker container stop $CONTAINER_NAME
-#            sudo docker system prune -af
-            sudo docker build -t $CONTAINER_NAME .
-            sudo docker run --rm -d --network host --volume /etc/letsencrypt/live/energet.shop:/ssl $CONTAINER_NAME
+            sudo docker build -t my-app .
+            sudo docker run --rm -d --network host --volume /etc/letsencrypt/live/energet.shop:/ssl my-app
 
   notify-success:
     runs-on: ubuntu-latest
