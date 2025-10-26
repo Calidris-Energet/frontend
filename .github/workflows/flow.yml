@@ -192,12 +192,11 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: | 
-            cd /home/energet/frontend 
-            sudo git fetch
-            git checkout ${{ github.ref_name }}
+            cd /home/energet/frontend && 
+            git checkout ${{ github.ref_name }} && 
             git pull
 
-      - name: Build Docker container
+      - name: Build frontend
         uses: appleboy/ssh-action@master
         with:
           timeout: 10m
@@ -207,6 +206,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd /home/energet/frontend/
+            sudo git fetch || exit 1
+            sudo git checkout ${{ github.ref_name }}
+            sudo git pull
             docker build -t my-app:latest .
             docker run --rm -d --network host my-app:latest
 
