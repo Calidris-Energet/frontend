@@ -13,10 +13,10 @@ RUN npm run build
 #базовый образ
 FROM nginx:alpine
 
-COPY --from=build /app/dist/ /dist
+COPY --from=build /app/dist /usr/share/nginx/html
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 8072
+EXPOSE 443
 
 CMD ["nginx", "-g", "daemon off;"]

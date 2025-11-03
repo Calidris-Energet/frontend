@@ -207,7 +207,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd /home/energet/frontend/ &&
-            sudo docker run --rm --volume /etc/letsencrypt:/ssl:ro front
+            sudo docker run --rm --volume /etc/letsencrypt:/ssl:ro --network=energet-network --name frontend front
 
   notify-success:
     runs-on: ubuntu-latest
