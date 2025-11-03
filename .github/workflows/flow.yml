@@ -206,7 +206,8 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /home/energet/frontend/ &&
+            cd /home/energet/frontend/
+            sudo docker container stop frontend
             sudo docker run --rm --volume /etc/letsencrypt:/ssl:ro --network=energet-network --name frontend front
 
   notify-success:
