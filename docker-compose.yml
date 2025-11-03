@@ -4,7 +4,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - 8011:80
     environment:
       NODE_ENV: production
+    networks:
+      - energet-network
+
+networks:
+  energet-network:
+    external: true
+    name: energet-network
