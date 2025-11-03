@@ -5,8 +5,6 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 8011:443
-    volumes:
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - 8011:80
     environment:
       NODE_ENV: production
