@@ -206,12 +206,8 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            # Source NVM
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
-    
-            cd /home/energet/frontend/ && nvm use && npm ci && npm run build
+            cd /home/energet/frontend/ &&
+            sudo docker run --rm --volume /etc/letsencrypt:/ssl:ro front
 
   notify-success:
     runs-on: ubuntu-latest
