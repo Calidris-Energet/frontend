@@ -207,6 +207,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd /home/energet/frontend/
+            sudo docker compose down
             sudo docker compose up --build -d
 
   notify-success:
