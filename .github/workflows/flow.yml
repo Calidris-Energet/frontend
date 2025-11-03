@@ -193,7 +193,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: | 
             cd /home/energet/frontend && 
-            sudo fetch &&
+            sudo git fetch &&
             sudo git checkout ${{ github.ref_name }} && 
             sudo git pull
 
