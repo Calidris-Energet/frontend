@@ -5,6 +5,7 @@ on:
     workflows: [ "CI" ]
     types:
       - completed
+    branches: [task-12-v2]
 
 env:
   TELEGRAM_GROUP_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
