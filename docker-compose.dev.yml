@@ -1,6 +1,6 @@
 services:
-  nginx-frontend:
-    container_name: frontend
+  nginx:
+    container_name: frontend-dev
     build:
       context: .
       dockerfile: Dockerfile

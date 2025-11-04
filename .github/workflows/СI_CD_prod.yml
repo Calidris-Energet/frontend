@@ -209,7 +209,7 @@ jobs:
             cd /home/energet/frontend/prod/
             docker compose down -v
             docker system prune -af
-            docker compose up --build -d
+            docker compose -f docker-compose.prod.yml up --build -d
 
   notify-success:
     runs-on: ubuntu-latest
