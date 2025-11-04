@@ -1,7 +1,9 @@
 name: Deploy Frontend Dev
 
 on:
-  pull_request:
+  push:
+    branches-ignore:
+      - main
 
 env:
   TELEGRAM_GROUP_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
