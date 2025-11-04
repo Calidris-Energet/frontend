@@ -1,4 +1,4 @@
-name: Deploy Frontend
+name: Deploy Frontend Dev
 
 on: pull_request
 
@@ -189,9 +189,9 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /home/energet/frontend && 
-            git fetch &&
-            git checkout ${{ github.ref_name }} && 
+            cd /home/energet/frontend/dev/
+            git fetch
+            git checkout ${{ github.ref_name }}
             git pull
 
       - name: Build frontend
@@ -203,7 +203,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /home/energet/frontend/
+            cd /home/energet/frontend/dev/
             docker compose down -v
             docker system prune -af
             docker compose up --build -d
