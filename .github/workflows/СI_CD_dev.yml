@@ -1,9 +1,6 @@
 name: Deploy Frontend Dev
 
-on:
-  push:
-    branches-ignore:
-      - main
+on: pull_request
 
 env:
   TELEGRAM_GROUP_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -194,7 +191,7 @@ jobs:
           script: |
             cd /home/energet/frontend/dev/
             git fetch
-            git checkout ${{ github.ref_name }}
+            git checkout ${{ github.head_ref }}
             git pull
 
       - name: Build frontend
