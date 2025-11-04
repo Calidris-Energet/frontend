@@ -64,7 +64,6 @@ function App() {
                 </Box>
             ) : (
                 <div className={styles.root}>
-                    <h3>asdf</h3>
                     <Header />
                     <AppRouter />
                 </div>
