@@ -1,6 +1,10 @@
 name: CD
 
-on: workflow_dispatch
+on:
+  workflow_run:
+    workflows: [ "CI" ]
+    types:
+      - completed
 
 env:
   TELEGRAM_GROUP_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
