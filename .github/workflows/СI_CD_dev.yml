@@ -204,8 +204,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd /home/energet/frontend/dev/
-            docker compose down -v
-            docker system prune -af
+            docker compose -f docker-compose.dev.yml down -v
             docker compose -f docker-compose.dev.yml up --build -d
 
   notify-success:
