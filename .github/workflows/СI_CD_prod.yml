@@ -208,7 +208,6 @@ jobs:
           script: |
             cd /home/energet/frontend/prod/
             docker compose -f docker-compose.prod.yml down -v
-#            docker system prune -af
             docker compose -f docker-compose.prod.yml up --build -d
 
   notify-success:
