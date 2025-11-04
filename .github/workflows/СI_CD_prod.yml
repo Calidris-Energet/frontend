@@ -193,9 +193,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: | 
             cd /home/energet/frontend/prod/
-            sudo git fetch
-            sudo git checkout ${{ github.ref_name }}
-            sudo git pull
+            git fetch
+            git checkout ${{ github.ref_name }}
+            git pull
 
       - name: Build frontend
         uses: appleboy/ssh-action@master
@@ -207,9 +207,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd /home/energet/frontend/prod/
-            sudo docker compose down -v
-            sudo docker system prune -af
-            sudo docker compose up --build -d
+            docker compose down -v
+            docker system prune -af
+            docker compose up --build -d
 
   notify-success:
     runs-on: ubuntu-latest
