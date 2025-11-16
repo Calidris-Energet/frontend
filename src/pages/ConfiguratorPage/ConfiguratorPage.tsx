@@ -11,7 +11,10 @@ import {
     Stepper,
     Typography,
     IconButton,
-    Tooltip,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
 } from "@mui/material";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import {
@@ -34,30 +37,63 @@ export const ConfiguratorPage = () => {
     const steps = [
         { 
             label: "Локация", 
-            tooltip: "В разработке. Здесь вы можете выбрать местоположение для расчета." 
+            onboardingContent: {
+                title: "Локация",
+                description: "Здесь вы можете выбрать местоположение для расчета солнечной электростанции.",
+                image: "example.png",
+                steps: [
+                    "Выберите местоположение на карте",
+                    "Укажите координаты вручную",
+                    "Система автоматически определит солнечную инсоляцию"
+                ]
+            }
         },
         { 
             label: "Потребление", 
-            tooltip: "В разработке. Здесь вы можете указать параметры энергопотребления." 
+            onboardingContent: {
+                title: "Потребление",
+                description: "Настройте параметры энергопотребления вашего объекта.",
+                image: "example.png",
+                steps: [
+                    "Укажите среднесуточное потребление",
+                    "Задайте сезонные коэффициенты",
+                    "Определите пиковые нагрузки"
+                ]
+            }
         },
         { 
             label: "Оптимизация", 
-            tooltip: "В разработке. Здесь вы можете настроить параметры оптимизации системы." 
+            onboardingContent: {
+                title: "Оптимизация",
+                description: "Настройте параметры для оптимальной работы системы.",
+                image: "example.png",
+                steps: [
+                    "Выберите критерии оптимизации",
+                    "Настройте бюджетные ограничения",
+                    "Определите приоритеты системы"
+                ]
+            }
         },
         { 
             label: "Результат", 
-            tooltip: "В разработке. Здесь вы можете просмотреть результаты расчета конфигурации." 
+            onboardingContent: {
+                title: "Результа",
+                description: "Просмотрите итоговую конфигурацию системы.",
+                image: "example.png"
+            }
         },
     ];
 
     const [step, setStep] = useState(0);
+    const [onboardingOpen, setOnboardingOpen] = useState(false);
+    const [currentOnboardingStep, setCurrentOnboardingStep] = useState(0);
 
     const { loading, items } = useAppSelector(
         (state) => state.configuratorReducer
     );
 
     const navigate = useNavigate();
-
+    
     const dispatch = useAppDispatch();
 
     const handleStep = async (index) => {
@@ -85,6 +121,15 @@ export const ConfiguratorPage = () => {
         navigate("/");
         dispatch(resetConfigurator());
         setStep(0);
+    };
+
+    const handleOpenOnboarding = (stepIndex) => {
+        setCurrentOnboardingStep(stepIndex);
+        setOnboardingOpen(true);
+    };
+
+    const handleCloseOnboarding = () => {
+        setOnboardingOpen(false);
     };
 
     const isLastStep = step == 3;
@@ -132,7 +177,7 @@ export const ConfiguratorPage = () => {
             </Stack>
         );
     }
-
+    
     // const saveToDraft = async () => {
     //     navigate("/");
     //     await dispatch(saveDraftCalculation());
@@ -156,11 +201,13 @@ export const ConfiguratorPage = () => {
                                         >
                                             {stepItem.label}
                                         </StepButton>
-                                        <Tooltip title={stepItem.tooltip} arrow placement="top">
-                                            <IconButton size="small" sx={{ ml: 0.5 }}>
-                                                <HelpOutlineIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
+                                        <IconButton 
+                                            size="small" 
+                                            sx={{ ml: 0.5 }}
+                                            onClick={() => handleOpenOnboarding(index)}
+                                        >
+                                            <HelpOutlineIcon fontSize="small" />
+                                        </IconButton>
                                     </Box>
                                 </Step>
                             );
@@ -198,6 +245,82 @@ export const ConfiguratorPage = () => {
                     </Box>
                 </Box>
             </Stack>
+
+            {/* Окно онбординга */}
+            <Dialog
+                open={onboardingOpen}
+                onClose={handleCloseOnboarding}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogTitle>
+                    {steps[currentOnboardingStep]?.onboardingContent?.title || "Онбординг"}
+                </DialogTitle>
+                <DialogContent>
+                    <Stack spacing={3}>
+                        {/* Картинка */}
+                        {steps[currentOnboardingStep]?.onboardingContent?.image && (
+                            <Box 
+                                sx={{ 
+                                    width: '100%', 
+                                    height: 200, 
+                                    backgroundImage: `url(${steps[currentOnboardingStep].onboardingContent.image})`,
+                                    backgroundSize: 'contain',
+                                    backgroundPosition: 'center',
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundColor: '#f5f5f5',
+                                    borderRadius: 1
+                                }}
+                            />
+                        )}
+                        
+                        {/* Описание */}
+                        <Typography variant="body1">
+                            {steps[currentOnboardingStep]?.onboardingContent?.description}
+                        </Typography>
+                        
+                        {/* Шаги */}
+                        {steps[currentOnboardingStep]?.onboardingContent?.steps && currentOnboardingStep !== 3 && (
+                            <Box>
+                                <Typography variant="h6" gutterBottom>
+                                    Шаги:
+                                </Typography>
+                                <Stack spacing={1}>
+                                    {steps[currentOnboardingStep].onboardingContent.steps.map((stepText, index) => (
+                                        <Box key={index} display="flex" alignItems="flex-start">
+                                            <Typography 
+                                                variant="body2" 
+                                                sx={{ 
+                                                    minWidth: 24, 
+                                                    height: 24, 
+                                                    borderRadius: '50%', 
+                                                    backgroundColor: 'primary.main', 
+                                                    color: 'white', 
+                                                    display: 'flex', 
+                                                    alignItems: 'center', 
+                                                    justifyContent: 'center',
+                                                    fontSize: '0.75rem',
+                                                    mr: 1
+                                                }}
+                                            >
+                                                {index + 1}
+                                            </Typography>
+                                            <Typography variant="body2">
+                                                {stepText}
+                                            </Typography>
+                                        </Box>
+                                    ))}
+                                </Stack>
+                            </Box>
+                        )}
+                    </Stack>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseOnboarding}>
+                        Закрыть
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 };
