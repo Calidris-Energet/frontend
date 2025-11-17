@@ -1,9 +1,9 @@
-name: Deploy Frontend
+name: Deploy Frontend Prod
 
 on:
   push:
-  pull_request:
-    types: [opened]
+    branches:
+      - main
 
 env:
   TELEGRAM_GROUP_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -192,8 +192,9 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: | 
-            cd /home/energet/frontend && 
-            git checkout ${{ github.ref_name }} && 
+            cd /home/energet/frontend/prod/
+            git fetch
+            git checkout ${{ github.ref_name }}
             git pull
 
       - name: Build frontend
@@ -205,12 +206,9 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            # Source NVM
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
-    
-            cd /home/energet/frontend/ && nvm use && npm ci && npm run build
+            cd /home/energet/frontend/prod/
+            docker compose -f docker-compose.prod.yml down -v
+            docker compose -f docker-compose.prod.yml up --build -d
 
   notify-success:
     runs-on: ubuntu-latest
