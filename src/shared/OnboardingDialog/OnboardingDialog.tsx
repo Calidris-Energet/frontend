@@ -18,10 +18,13 @@ interface OnboardingDialogProps {
 }
 
 export const OnboardingDialog = ({ open, onClose, content }: OnboardingDialogProps) => {
-    // Проверка на наличие контента
-    if (!content) {
-        return null;
-    }
+    // Значения по умолчанию вместо проверки на null
+    const {
+        title = "Онбординг",
+        description = "",
+        image = "",
+        steps = []
+    } = content || {};
 
     return (
         <Dialog
@@ -31,17 +34,17 @@ export const OnboardingDialog = ({ open, onClose, content }: OnboardingDialogPro
             fullWidth
         >
             <DialogTitle>
-                {content.title || "Онбординг"}
+                {title}
             </DialogTitle>
             <DialogContent>
                 <Stack spacing={3}>
                     {/* Картинка */}
-                    {content.image && (
+                    {image && (
                         <Box 
                             sx={{ 
                                 width: '100%', 
                                 height: 200, 
-                                backgroundImage: `url(${content.image})`,
+                                backgroundImage: `url(${image})`,
                                 backgroundSize: 'contain',
                                 backgroundPosition: 'center',
                                 backgroundRepeat: 'no-repeat',
@@ -52,20 +55,20 @@ export const OnboardingDialog = ({ open, onClose, content }: OnboardingDialogPro
                     )}
 
                     {/* Описание */}
-                    {content.description && (
+                    {description && (
                         <Typography variant="body1">
-                            {content.description}
+                            {description}
                         </Typography>
                     )}
 
                     {/* Шаги */}
-                    {content.steps && content.steps.length > 0 && (
+                    {steps.length > 0 && (
                         <Box>
                             <Typography variant="h6" gutterBottom>
                                 Шаги:
                             </Typography>
                             <Stack spacing={1}>
-                                {content.steps.map((stepText, index) => (
+                                {steps.map((stepText, index) => (
                                     <Box key={index} display="flex" alignItems="flex-start">
                                         <Typography 
                                             variant="body2" 
