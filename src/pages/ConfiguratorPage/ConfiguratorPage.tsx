@@ -29,57 +29,10 @@ import { CoordsPicker } from "src/widgets/CoordsPicker/CoordsPicker.tsx";
 import { Optimization } from "src/widgets/Optimization/Optimization.tsx";
 import { TabPanel } from "src/widgets/TabPanel/TabPanel.tsx";
 import { OnboardingDialog } from "src/shared/OnboardingDialog/OnboardingDialog.tsx";
+import { onboardingSteps } from "src/shared/OnboardingSteps/OnboardingSteps";
 
 export const ConfiguratorPage = () => {
-    const steps = [
-        { 
-            label: "Локация", 
-            onboardingContent: {
-                title: "Локация",
-                description: "Здесь вы можете выбрать местоположение для расчета солнечной электростанции.",
-                image: "example.png",
-                steps: [
-                    "Выберите местоположение на карте",
-                    "Укажите координаты вручную",
-                    "Система автоматически определит солнечную инсоляцию"
-                ]
-            }
-        },
-        { 
-            label: "Потребление", 
-            onboardingContent: {
-                title: "Потребление",
-                description: "Настройте параметры энергопотребления вашего объекта.",
-                image: "example.png",
-                steps: [
-                    "Укажите среднесуточное потребление",
-                    "Задайте сезонные коэффициенты",
-                    "Определите пиковые нагрузки"
-                ]
-            }
-        },
-        { 
-            label: "Оптимизация", 
-            onboardingContent: {
-                title: "Оптимизация",
-                description: "Настройте параметры для оптимальной работы системы.",
-                image: "example.png",
-                steps: [
-                    "Выберите критерии оптимизации",
-                    "Настройте бюджетные ограничения",
-                    "Определите приоритеты системы"
-                ]
-            }
-        },
-        { 
-            label: "Результат", 
-            onboardingContent: {
-                title: "Результат",
-                description: "Просмотрите итоговую конфигурацию системы.",
-                image: "example.png"
-            }
-        },
-    ];
+    const steps = onboardingSteps;
 
     const [step, setStep] = useState(0);
     const [onboardingOpen, setOnboardingOpen] = useState(false);
@@ -90,7 +43,7 @@ export const ConfiguratorPage = () => {
     );
 
     const navigate = useNavigate();
-    
+
     const dispatch = useAppDispatch();
 
     const handleStep = async (index) => {
@@ -174,14 +127,7 @@ export const ConfiguratorPage = () => {
             </Stack>
         );
     }
-    
-    // const saveToDraft = async () => {
-    //     navigate("/");
-    //     await dispatch(saveDraftCalculation());
-    //     dispatch(resetConfigurator());
-    //     setStep(0);
-    // };
-    
+
     const nextStepBtnVisible = !isLastStep;
 
     return (
