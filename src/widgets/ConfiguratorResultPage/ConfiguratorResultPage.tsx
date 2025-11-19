@@ -44,7 +44,7 @@ const ConfiguratorResultPage = ({ items, setStep }) => {
         <Stack gap={3}>
             <Stack direction="row" alignItems="center" gap={1}>
                 <Typography variant="h6">Оптимальные параметры</Typography>
-                <Tooltip title="Быстрая оценка">
+                <Tooltip title="Быстрая оценка" arrow placement="right">
                     <IconButton>
                         <HelpIcon />
                     </IconButton>
@@ -53,10 +53,7 @@ const ConfiguratorResultPage = ({ items, setStep }) => {
             <ConfiguratorResultParamsTable />
             <Stack direction="row" alignItems="center" gap={1}>
                 <Typography variant="h6">Оптимальная конфигурация</Typography>
-                <Tooltip
-                    title="C уточненными стоимостными
-                    показателями"
-                >
+                <Tooltip title="C уточненными стоимостными показателями" arrow placement="right">
                     <IconButton>
                         <HelpIcon />
                     </IconButton>
