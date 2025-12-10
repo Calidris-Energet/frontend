@@ -206,6 +206,7 @@ jobs:
         with:
           start: npm run dev
           wait-on: 'http://localhost:3000'
+          browser: chrome
 
       - name: Get Current Job Log URL
         uses: Tiryoh/gha-jobid-action@main
