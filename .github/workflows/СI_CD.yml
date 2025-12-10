@@ -24,7 +24,7 @@ jobs:
       - name: Установка Node.js
         uses: actions/setup-node@master
         with:
-          node-version: 23
+          node-version: 24
 
       - name: Cache npm dependencies
         uses: actions/cache@master
@@ -76,7 +76,7 @@ jobs:
       - name: Установка Node.js
         uses: actions/setup-node@master
         with:
-          node-version: 23
+          node-version: 24
 
       - name: Restore npm dependencies
         uses: actions/cache@master
@@ -121,19 +121,17 @@ jobs:
     needs: install-cache
 
     permissions:
-      # Required to checkout the code
       contents: read
-      # Required to put a comment into the pull-request
       pull-requests: write
 
     steps:
       - name: Checkout Commit
-        uses: actions/checkout@v2
+        uses: actions/checkout@master
 
       - name: Установка Node.js
         uses: actions/setup-node@master
         with:
-          node-version: 23
+          node-version: 24
 
       - name: Restore npm dependencies
         uses: actions/cache@master
@@ -148,8 +146,6 @@ jobs:
         run: npx vitest --coverage.enabled true
 
       - name: 'Report Coverage'
-        # Set if: always() to also generate the report if tests are failing
-        # Only works if you set `reportOnFailure: true` in your vite config as specified above
         if: always()
         uses:  davelosert/vitest-coverage-report-action@v2
 
@@ -189,12 +185,12 @@ jobs:
 
     steps:
       - name: Checkout Commit
-        uses: actions/checkout@v6
+        uses: actions/checkout@master
 
       - name: Установка Node.js
         uses: actions/setup-node@master
         with:
-          node-version: 23
+          node-version: 24
 
       - name: Restore npm dependencies
         uses: actions/cache@master
@@ -207,6 +203,9 @@ jobs:
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
+        with:
+          build: npm run build
+          start: npm run dev
 
       - name: Get Current Job Log URL
         uses: Tiryoh/gha-jobid-action@main
