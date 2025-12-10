@@ -1,5 +1,5 @@
 import react from "@vitejs/plugin-react";
-import { loadEnv, ConfigEnv } from "vite";
+import { ConfigEnv, loadEnv } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
@@ -9,7 +9,7 @@ export default ({ mode }: ConfigEnv) => {
     return defineConfig({
         base: "/",
         server: {
-            port: 80,
+            port: 3000,
             host: true,
             proxy: {
                 "/api": {
