@@ -38,7 +38,7 @@ describe("template spec", () => {
             },
         }).as("login");
 
-        cy.visit("http://localhost/login");
+        cy.visit("http://localhost:3000/login");
 
         cy.window().then((win) => {
             win.localStorage.setItem("onb_shown", "true");
