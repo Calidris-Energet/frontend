@@ -27,6 +27,7 @@ const Header = () => {
             path: "/",
             extraPaths: ["/items/:id", "/items/:id/edit"],
             label: role == E_UserRole.Producer ? "Мои товары" : "Каталог",
+            testId: "home",
         },
         {
             id: 2,
@@ -34,6 +35,7 @@ const Header = () => {
             label: "Добавить товар",
             needAuth: true,
             roles: [E_UserRole.Producer],
+            testId: "add-item",
         },
         {
             id: 3,
@@ -41,6 +43,7 @@ const Header = () => {
             label: "Конфигуратор",
             needAuth: true,
             roles: [E_UserRole.Buyer],
+            testId: "configurator",
         },
         {
             id: 4,
@@ -48,6 +51,7 @@ const Header = () => {
             label: "Заказы",
             needAuth: true,
             roles: [E_UserRole.Moderator],
+            testId: "configurator",
         },
     ];
 
@@ -58,6 +62,7 @@ const Header = () => {
             label: "Профиль",
             needAuth: true,
             icon: <PersonOutlineIcon className={styles.icon} />,
+            testId: "profile",
         },
         {
             id: 6,
@@ -66,6 +71,7 @@ const Header = () => {
             label: "Вход",
             needAuth: false,
             icon: <PersonOutlineIcon className={styles.icon} />,
+            testId: "login",
         },
         {
             id: 7,
@@ -73,6 +79,7 @@ const Header = () => {
             label: "Избранное",
             needAuth: true,
             roles: [E_UserRole.Buyer],
+            testId: "favourites",
         },
     ];
 

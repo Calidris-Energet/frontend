@@ -40,7 +40,7 @@ function App() {
 
     useEffect(() => {
         onAppStarted();
-    }, [onAppStarted]);
+    }, []);
 
     const isAuthenticated = useSelector(getIsAuthenticated);
 

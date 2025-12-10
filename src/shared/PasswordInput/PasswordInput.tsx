@@ -9,6 +9,7 @@ export const PasswordInput = ({
     name = "password",
     register,
     error,
+    id,
 }) => {
     const [showPassword, setShowPassword] = useState(false);
     const handleClickShowPassword = () => setShowPassword(!showPassword);
@@ -40,6 +41,7 @@ export const PasswordInput = ({
             })}
             error={!!error}
             helperText={error?.message}
+            id={id}
         />
     );
 };
