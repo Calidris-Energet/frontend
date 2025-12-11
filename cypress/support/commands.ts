@@ -1,6 +1,9 @@
 import * as allure from "allure-js-commons";
 
 Cypress.Commands.add("setupAuthMocks", () => {
+    allure.epic("Authentication");
+    allure.feature("API Mocking");
+
     cy.intercept("POST", "/api/auth/check/", {
         statusCode: 401,
         body: { message: "Unauthorized", statusCode: 401 },
@@ -40,34 +43,93 @@ Cypress.Commands.add("setupAuthMocks", () => {
 
 // Команда для логина
 Cypress.Commands.add("login", (email = "user@user.com", password = "1234") => {
-    cy.visit("/login");
+    allure.epic("Authentication");
+    allure.feature("User Login");
+    allure.story("Successful Login");
+    allure.severity(allure.Severity.BLOCKER);
 
-    cy.window().then((win) => {
-        win.localStorage.setItem("onb_shown", "true");
+    allure.step("Navigate to login page", () => {
+        cy.visit("/login");
     });
 
-    allure.description("Enter valid credentials");
-    cy.get('[data-test-id="login"]').click();
-    cy.get('input[name="email"]').type(email);
-    cy.get('input[name="password"]').type(password);
+    allure.step("Set localStorage flag for onboarding", () => {
+        cy.window().then((win) => {
+            win.localStorage.setItem("onb_shown", "true");
+        });
+    });
 
-    allure.description("Click login button");
-    cy.get('button[type="submit"]').click();
+    allure.step("Click on login button to open form", () => {
+        allure.description("Enter valid credentials");
+        cy.get('[data-test-id="login"]').click();
+    });
 
-    cy.wait("@login");
-    cy.wait("@check");
+    allure.step("Fill email field", () => {
+        cy.get('input[name="email"]').type(email);
+    });
 
-    allure.description("Verify successful redirection");
-    cy.url().should("include", "/");
+    allure.step("Fill password field", () => {
+        cy.get('input[name="password"]').type(password);
+    });
+
+    allure.step("Submit login form", () => {
+        allure.description("Click login button");
+        cy.get('button[type="submit"]').click();
+    });
+
+    allure.step("Wait for login API call", () => {
+        cy.wait("@login");
+    });
+
+    allure.step("Wait for auth check API call", () => {
+        cy.wait("@check");
+    });
+
+    allure.step("Verify successful redirection to home page", () => {
+        allure.description("Verify successful redirection");
+        cy.url().should("include", "/");
+    });
 });
 
 // Команда для проверки профиля
 Cypress.Commands.add("verifyProfile", (user) => {
-    cy.get('[data-test-id="profile"]').click();
+    allure.epic("User Profile");
+    allure.feature("Profile Information");
+    allure.story("Verify Profile Data");
+    allure.severity(allure.Severity.CRITICAL);
 
-    cy.get('input[id="profile-name-field"]').should("have.value", user.name);
+    allure.step("Navigate to profile section", () => {
+        cy.get('[data-test-id="profile"]').click();
+    });
 
-    cy.get('input[id="profile-phone-field"]').should("have.value", user.phone);
+    allure.step("Verify name field matches user data", () => {
+        cy.get('input[id="profile-name-field"]').should(
+            "have.value",
+            user.name
+        );
+        allure.attachment("Expected Name", user.name, allure.ContentType.TEXT);
+    });
 
-    cy.get('input[id="profile-email-field"]').should("have.value", user.email);
+    allure.step("Verify phone field matches user data", () => {
+        cy.get('input[id="profile-phone-field"]').should(
+            "have.value",
+            user.phone
+        );
+        allure.attachment(
+            "Expected Phone",
+            user.phone,
+            allure.ContentType.TEXT
+        );
+    });
+
+    allure.step("Verify email field matches user data", () => {
+        cy.get('input[id="profile-email-field"]').should(
+            "have.value",
+            user.email
+        );
+        allure.attachment(
+            "Expected Email",
+            user.email,
+            allure.ContentType.TEXT
+        );
+    });
 });
