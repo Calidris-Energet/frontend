@@ -180,7 +180,7 @@ jobs:
     needs: install-cache
 
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       pages: write
       id-token: write
