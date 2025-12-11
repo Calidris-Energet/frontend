@@ -44,14 +44,18 @@ Cypress.Commands.add("login", (email = "user@user.com", password = "1234") => {
         win.localStorage.setItem("onb_shown", "true");
     });
 
+    cy.allure().step("Enter valid credentials");
     cy.get('[data-test-id="login"]').click();
     cy.get('input[name="email"]').type(email);
     cy.get('input[name="password"]').type(password);
+
+    cy.allure().step("Click login button");
     cy.get('button[type="submit"]').click();
 
     cy.wait("@login");
     cy.wait("@check");
 
+    cy.allure().step("Verify successful redirection");
     cy.url().should("include", "/");
 });
 
