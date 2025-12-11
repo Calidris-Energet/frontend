@@ -1,5 +1,6 @@
-export {};
+/// <reference types="cypress" />
 
+// Расширяем типы Cypress
 declare global {
     namespace Cypress {
         interface Chainable {
@@ -9,3 +10,5 @@ declare global {
         }
     }
 }
+
+export {};
