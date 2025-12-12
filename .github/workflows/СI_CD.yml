@@ -224,13 +224,14 @@ jobs:
             allure-report/
           retention-days: 7
 
-      - name: Get Current Job Log URL
-        uses: Tiryoh/gha-jobid-action@main
-        if: always()
+      - name: Generate Job URL manually
         id: get-job-url
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          job_name: ${{ github.job }}
+        if: always()
+        run: |
+          # Формируем URL джобы вручную
+          JOB_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ github.job }}"
+          echo "job_url=$JOB_URL" >> $GITHUB_OUTPUT
+          echo "Generated job URL: $JOB_URL"
 
   deploy-allure-report:
     runs-on: ubuntu-latest
