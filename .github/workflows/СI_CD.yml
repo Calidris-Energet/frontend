@@ -276,7 +276,6 @@ jobs:
           
           for xml_file in cypress/results/test-results-*.xml; do
             if [ -f "$xml_file" ]; then
-              # Берем время из корневого элемента testsuites
               root_time=$(grep -o 'testsuites.*time="[^"]*"' "$xml_file" 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2)
               root_time=${root_time:-0}
               
@@ -284,7 +283,6 @@ jobs:
             fi
           done
           
-          # Форматируем результат
           if [ -z "$TOTAL_TIME" ] || [ "$TOTAL_TIME" = "0" ]; then
             TOTAL_TIME="0"
             else
