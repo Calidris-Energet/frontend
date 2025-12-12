@@ -266,31 +266,60 @@ jobs:
         id: parse-report
         with:
           check_name: Cypress Test Results
-          report_paths: 'cypress/results/test-results.xml'
+          report_paths: 'cypress/results/test-results-*.xml'
           include_passed: true
           include_skipped: true
           job_summary: false
 
-      - name: Parse XML and calculate execution time
+      - name: Calculate total execution time from all XML files
         id: parse_xml
         run: |
-          if [ -f "cypress/results/test-results.xml" ]; then
-            # Извлекаем время из корневого элемента testsuites
-            root_time=$(grep -o 'testsuites.*time="[^"]*"' cypress/results/test-results.xml 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2)
+          echo "=== Calculating total execution time from all test files ==="
           
-            # Если время в корне не найдено или равно 0, суммируем время всех testsuite
-            if [ -z "$root_time" ] || [ "$root_time" = "0" ] || [ "$root_time" = "0.000" ]; then
-              # Используем awk для суммирования всех времен testsuite
-              execution_time=$(grep -o 'testsuite.*time="[^"]*"' cyppress/results/test-results.xml 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2 | awk '{sum += $1} END {printf "%.3f", sum}')
-              execution_time=${execution_time:-0}
-            else
-              execution_time=$root_time
+          # Инициализируем переменные
+          TOTAL_TIME=0
+          
+          # Обрабатываем каждый XML файл
+          for xml_file in cypress/results/test-results-*.xml; do
+            if [ -f "$xml_file" ]; then
+              FILE_COUNT=$((FILE_COUNT + 1))
+              echo "Processing file: $xml_file"
+          
+              # Извлекаем время из корневого элемента testsuites
+              root_time=$(grep -o 'testsuites.*time="[^"]*"' "$xml_file" 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2)
+           
+              # Если время в корне не найдено или равно 0, суммируем время всех testsuite
+              if [ -z "$root_time" ] || [ "$root_time" = "0" ] || [ "$root_time" = "0.000" ]; then
+                # Используем awk для суммирования всех времен testsuite
+                file_time=$(grep -o 'testsuite.*time="[^"]*"' "$xml_file" 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2 | awk '{sum += $1} END {printf "%.3f", sum}')
+                file_time=${file_time:-0}
+              else
+                file_time=$root_time
+              fi
+          
+              # Суммируем общие значения
+              TOTAL_TIME=$(echo "$TOTAL_TIME + $file_time" | bc -l 2>/dev/null || echo "$TOTAL_TIME")
+          
+              echo "  File time: $file_time seconds"
             fi
+          done
           
-            echo "executionTime=$execution_time" >> $GITHUB_OUTPUT
-          
-            echo "Execution time: $execution_time seconds"
+          # Форматируем общее время
+          if [ -z "$TOTAL_TIME" ] || [ "$TOTAL_TIME" = "0" ]; then
+            TOTAL_TIME="0"
           else
+            TOTAL_TIME=$(printf "%.3f" $TOTAL_TIME 2>/dev/null || echo "0")
+          fi
+          
+          echo "=== SUMMARY ==="
+          echo "Total execution time: $TOTAL_TIME seconds"
+          
+          # Сохраняем результаты
+          echo "executionTime=$TOTAL_TIME" >> $GITHUB_OUTPUT
+          
+          # Если файлов не найдено
+          if [ $FILE_COUNT -eq 0 ]; then
+            echo "No test result files found!"
             echo "executionTime=0" >> $GITHUB_OUTPUT
           fi
 

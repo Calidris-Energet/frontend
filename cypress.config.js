@@ -12,7 +12,7 @@ export default defineConfig({
         },
         reporter: "junit",
         reporterOptions: {
-            mochaFile: "cypress/results/test-results.xml",
+            mochaFile: "cypress/results/test-results-[hash].xml",
             toConsole: false,
         },
     },
