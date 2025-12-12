@@ -261,7 +261,7 @@ jobs:
         with:
           name: Cypress Tests
           path: cypress/results/*.xml
-          reporter: junit
+          reporter: jest-junit
 
       - name: Get counts and use them
         run: |
