@@ -278,7 +278,7 @@ jobs:
             🔹 Workflow: ${{ github.workflow }}
             🔹 Job: ${{ github.job }}
             
-            🔗 Ссылка на аллюр 🔗
+            📊 Allure отчет
             ${{ steps.allure-url.outputs.report_url }}
             
             🔗 Ссылка на джобу 🔗
