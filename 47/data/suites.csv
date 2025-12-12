@@ -1,2 +1,2 @@
 "DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"Verify successful redirection","3390","Успешная авторизация и проверка данных профиля","Авторизация и профиль пользователя","Fri Dec 12 15:53:52 UTC 2025","passed","Fri Dec 12 15:53:55 UTC 2025","","","",""
+"Verify successful redirection","3411","Успешная авторизация и проверка данных профиля","Авторизация и профиль пользователя","Fri Dec 12 16:02:14 UTC 2025","passed","Fri Dec 12 16:02:17 UTC 2025","","","",""
