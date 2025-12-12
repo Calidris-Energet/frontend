@@ -282,16 +282,11 @@ jobs:
               exit 0
             fi
             
-            echo "=== Parsing test results XML ==="
-            
             # Извлекаем время из корневого элемента testsuites
             root_time=$(grep -o 'testsuites.*time="[^"]*"' cypress/results/test-results.xml 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2)
-            echo "Root time: $root_time"
             
             # Если время в корне не найдено или равно 0, суммируем время всех testsuite
             if [ -z "$root_time" ] || [ "$root_time" = "0" ] || [ "$root_time" = "0.000" ]; then
-              echo "Calculating total time from testsuite elements..."
-            
               # Используем awk для суммирования всех времен testsuite
               total_time=$(grep -o 'testsuite.*time="[^"]*"' cypress/results/test-results.xml 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2 | awk '{sum += $1} END {printf "%.3f", sum}')
             
@@ -304,7 +299,7 @@ jobs:
               execution_time=$root_time
             fi
             
-            echo "Total execution time: $execution_time seconds"
+            echo "executionTime=$execution_time"
 
       - name: Generate Report
         if: always()
