@@ -308,10 +308,7 @@ jobs:
       - name: Get Allure Report URL
         id: allure-url
         run: |
-          # Формируем URL для Allure отчета
-          # Определяем имя папки с отчетом (обычно это номер прогона)
           REPORT_DIR="${{ github.run_number }}"
-          
           echo "report_url=https://${{ secrets.ALLURE_URL }}/$REPORT_DIR/" >> $GITHUB_OUTPUT
 
       - name: Parse and Publish Test Results

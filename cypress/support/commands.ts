@@ -146,10 +146,10 @@ Cypress.Commands.add(
             cy.get('input[name="repeatPassword"]').type(password);
         });
 
-        allure.step("Submit register form", () => {
-            allure.description("Click register button");
-            cy.get('button[type="submit"]').click();
-        });
+        // allure.step("Submit register form", () => {
+        //     allure.description("Click register button");
+        //     cy.get('button[type="submit"]').click();
+        // });
 
         allure.step("Wait for register API call", () => {
             cy.wait("@register");
