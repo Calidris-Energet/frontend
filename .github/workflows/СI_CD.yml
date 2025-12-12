@@ -252,7 +252,6 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
-          command: npx cypress run --reporter junit --reporter-options 'mochaFile=cypress-report.xml'
         env:
           CYPRESS_BASE_URL: ${{ secrets.PRODUCTION_URL }}
 
@@ -261,7 +260,7 @@ jobs:
         id: parse-report
         with:
           check_name: Cypress Test Results
-          report_paths: 'cypress-report.xml'
+          report_paths: 'cypress/results/test-results.xml'
           include_passed: true
 
       - name: Parse and Publish Test Results
