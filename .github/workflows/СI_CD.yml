@@ -276,29 +276,22 @@ jobs:
           
           for xml_file in cypress/results/test-results-*.xml; do
             if [ -f "$xml_file" ]; then
+              # Берем время из корневого элемента testsuites
               root_time=$(grep -o 'testsuites.*time="[^"]*"' "$xml_file" 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2)
-           
-              if [ -z "$root_time" ] || [ "$root_time" = "0" ] || [ "$root_time" = "0.000" ]; then
-                # Используем awk для суммирования всех времен testsuite
-                file_time=$(grep -o 'testsuite.*time="[^"]*"' "$xml_file" 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2 | awk '{sum += $1} END {printf "%.3f", sum}')
-                file_time=${file_time:-0}
-              else
-                file_time=$root_time
-              fi
-          
-              TOTAL_TIME=$(echo "$TOTAL_TIME + $file_time" | bc -l 2>/dev/null || echo "$TOTAL_TIME")
+              root_time=${root_time:-0}
+              
+              TOTAL_TIME=$(echo "$TOTAL_TIME + $root_time" | bc -l 2>/dev/null || echo "$TOTAL_TIME")
             fi
           done
           
+          # Форматируем результат
           if [ -z "$TOTAL_TIME" ] || [ "$TOTAL_TIME" = "0" ]; then
             TOTAL_TIME="0"
-          else
+            else
             TOTAL_TIME=$(printf "%.1f" $TOTAL_TIME 2>/dev/null || echo "0")
           fi
           
-          echo "=== SUMMARY ==="
           echo "Total execution time: $TOTAL_TIME seconds"
-          
           echo "executionTime=$TOTAL_TIME" >> $GITHUB_OUTPUT
 
       - name: Generate Report
