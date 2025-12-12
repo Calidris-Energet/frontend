@@ -127,7 +127,7 @@ Cypress.Commands.add(
         });
 
         allure.step("Fill first name field", () => {
-            cy.get('input[name="name"]').type(name);
+            cy.get('input[name="name"]').type("afs");
         });
 
         allure.step("Fill email field", () => {

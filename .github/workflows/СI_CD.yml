@@ -231,7 +231,6 @@ jobs:
       total: ${{ steps.parse-report.outputs.total }}
       passed: ${{ steps.parse-report.outputs.passed }}
       failed: ${{ steps.parse-report.outputs.failed }}
-      skipped: ${{ steps.parse-report.outputs.skipped }}
       executionTime: ${{ steps.parse_xml.outputs.executionTime }}
 
     steps:
@@ -266,7 +265,6 @@ jobs:
           check_name: Cypress Test Results
           report_paths: 'cypress/results/test-results-*.xml'
           include_passed: true
-          include_skipped: true
           job_summary: false
 
       - name: Calculate total execution time from all XML files
@@ -375,14 +373,14 @@ jobs:
         with:
           type: topic
           message: |
-            ✅️ ${{ github.repository }}
+            ✅️ Tests passing 
             
-            ⏱️ Execution Time: ${{needs.integration-tests-run.outputs.executionTime}} s
             🧪 Total: ${{needs.integration-tests-run.outputs.total}}
             ❌ Failed: ${{needs.integration-tests-run.outputs.failed}}
             ✅ Passed: ${{needs.integration-tests-run.outputs.total}}
+            ⏱️ Duration: ${{needs.integration-tests-run.outputs.executionTime}} s
             
-            📊 Allure отчет
+            📊 Allure
             ${{ steps.allure-url.outputs.report_url }}
 
       - name: Send Telegram Report Status
@@ -391,12 +389,12 @@ jobs:
         with:
           type: topic
           message: |
-            ❗ ${{ github.repository }}
+            ❌ Tests failed
             
-            ⏱️ Execution Time: ${{needs.integration-tests-run.outputs.executionTime}} s
             🧪 Total: ${{needs.integration-tests-run.outputs.total}}
             ❌ Failed: ${{needs.integration-tests-run.outputs.failed}}
             ✅ Passed: ${{needs.integration-tests-run.outputs.total}}
+            ⏱️ Duration: ${{needs.integration-tests-run.outputs.executionTime}} s
             
-            📊 Allure отчет
+            📊 Allure
             ${{ steps.allure-url.outputs.report_url }}
