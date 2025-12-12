@@ -250,6 +250,7 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
+          command: npx cypress run --reporter junit
         env:
           CYPRESS_BASE_URL: ${{ secrets.PRODUCTION_URL }}
 
