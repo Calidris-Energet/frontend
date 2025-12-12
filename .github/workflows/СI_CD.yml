@@ -178,7 +178,6 @@ jobs:
   integration-tests-run:
     runs-on: ubuntu-latest
     needs: install-cache
-    if: always()
     permissions:
       contents: read
       pull-requests: read
@@ -225,6 +224,7 @@ jobs:
   deploy-allure-report:
     runs-on: ubuntu-latest
     needs: integration-tests-run
+    if: always()
     permissions:
       contents: write
       pages: write
