@@ -253,8 +253,6 @@ jobs:
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
-        with:
-          browser: chrome
         env:
           CYPRESS_BASE_URL: ${{ secrets.PRODUCTION_URL }}
 

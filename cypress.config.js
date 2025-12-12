@@ -15,5 +15,6 @@ export default defineConfig({
             mochaFile: "cypress/results/test-results-[hash].xml",
             toConsole: false,
         },
+        defaultBrowser: "chrome",
     },
 });
