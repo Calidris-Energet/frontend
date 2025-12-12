@@ -10,12 +10,10 @@ export default defineConfig({
             });
             return config;
         },
-        reporter: "mochawesome",
+        reporter: "junit",
         reporterOptions: {
-            reportDir: "cypress/results",
-            overwrite: false,
-            html: false,
-            json: true,
+            mochaFile: "cypress/results/test-results-[hash].xml",
+            toConsole: false,
         },
     },
 });

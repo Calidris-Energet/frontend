@@ -250,8 +250,6 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
-          reporter: junit
-          reporter-options: 'mochaFile=cypress/results/test-results.xml'
         env:
           CYPRESS_BASE_URL: ${{ secrets.PRODUCTION_URL }}
 
