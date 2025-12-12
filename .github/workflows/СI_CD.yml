@@ -206,7 +206,7 @@ jobs:
           start: npm run dev
           wait-on: 'http://localhost:3000'
           browser: chrome
-          command: npx cypress run --reporter json --reporter-options "output=cypress-report.json"
+          command: npx cypress run --reporter json --reporter-options '{"output":"cypress-report.json"}'
 
       - name: Parse test results
         id: parse-test-results
@@ -241,6 +241,7 @@ jobs:
           path: |
             allure-results/
             allure-report/
+            cypress-report.json
           retention-days: 7
 
   deploy-allure-report:
