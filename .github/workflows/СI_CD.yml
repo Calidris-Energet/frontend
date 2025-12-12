@@ -182,9 +182,6 @@ jobs:
       contents: read
       pull-requests: read
 
-    outputs:
-      job-url: ${{ steps.get-job-url.outputs.html_url }}
-
     steps:
       - name: Checkout Commit
         uses: actions/checkout@master
@@ -223,15 +220,6 @@ jobs:
             allure-results/
             allure-report/
           retention-days: 7
-
-      - name: Generate Job URL manually
-        id: get-job-url
-        if: always()
-        run: |
-          # Формируем URL джобы вручную
-          JOB_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ github.job }}"
-          echo "job_url=$JOB_URL" >> $GITHUB_OUTPUT
-          echo "Generated job URL: $JOB_URL"
 
   deploy-allure-report:
     runs-on: ubuntu-latest
@@ -302,9 +290,6 @@ jobs:
             
             📊 Allure отчет
             ${{ steps.allure-url.outputs.report_url }}
-            
-            🔗 Ссылка на джобу 🔗
-            ${{ needs.integration-tests-run.outputs.job-url }}
             
             🔗 Ссылка на пайплайн 🔗
             ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
