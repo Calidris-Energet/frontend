@@ -264,7 +264,7 @@ jobs:
           # Определяем имя папки с отчетом (обычно это номер прогона)
           REPORT_DIR="${{ github.run_number }}"
           
-          echo "report_url=https://allure.energet.shop/$REPORT_DIR/" >> $GITHUB_OUTPUT
+          echo "report_url=https://${{ secrets.ALLURE_URL }}/$REPORT_DIR/" >> $GITHUB_OUTPUT
 
       - name: Send Telegram Error Message
         if: failure()
