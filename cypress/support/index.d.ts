@@ -6,6 +6,12 @@ declare global {
         interface Chainable {
             setupAuthMocks(): Chainable<void>;
             login(email: string, password: string): Chainable<void>;
+            register(
+                name: string,
+                phone: string,
+                email: string,
+                password: string
+            ): Chainable<void>;
             verifyProfile(user: Record<string, string>): Chainable<void>;
         }
     }
