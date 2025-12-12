@@ -366,7 +366,7 @@ jobs:
             
             🧪 Total: ${{needs.integration-tests-run.outputs.total}}
             ❌ Failed: ${{needs.integration-tests-run.outputs.failed}}
-            ✅ Passed: ${{needs.integration-tests-run.outputs.total}}
+            ✅ Passed: ${{needs.integration-tests-run.outputs.passed}}
             ⏱️ Duration: ${{needs.integration-tests-run.outputs.executionTime}} s
             
             📊 Allure
