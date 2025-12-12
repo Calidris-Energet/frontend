@@ -206,6 +206,28 @@ jobs:
           start: npm run dev
           wait-on: 'http://localhost:3000'
           browser: chrome
+          command: npx cypress run --reporter json --reporter-options "output=cypress-report.json"
+
+      - name: Parse test results
+        id: parse-test-results
+        if: always()
+        run: |
+          if [ -f "cypress-report.json" ]; then
+          # Парсим JSON отчет Cypress
+          TOTAL_TESTS=$(jq '.totalTests' cypress-report.json)
+          PASSED_TESTS=$(jq '.totalPassed' cypress-report.json)
+          FAILED_TESTS=$(jq '.totalFailed' cypress-report.json)
+          
+          echo "total=$TOTAL_TESTS" >> $GITHUB_OUTPUT
+          echo "passed=$PASSED_TESTS" >> $GITHUB_OUTPUT
+          echo "failed=$FAILED_TESTS" >> $GITHUB_OUTPUT
+          echo "test_stats=$PASSED_TESTS/$TOTAL_TESTS" >> $GITHUB_OUTPUT
+          else
+          echo "total=0" >> $GITHUB_OUTPUT
+          echo "passed=0" >> $GITHUB_OUTPUT
+          echo "failed=0" >> $GITHUB_OUTPUT
+          echo "test_stats=0/0" >> $GITHUB_OUTPUT
+          fi
 
       - name: Generate Report
         if: always()
@@ -294,7 +316,7 @@ jobs:
         with:
           type: topic
           message: |
-            ❗ Произошла ошибка во время прогона интеграционных тестов ❗
+            ❗ Произошла ошибка во время прогона тестов ❗
             
             🔹 Repo: ${{ github.repository }}
             🔹 Workflow: ${{ github.workflow }}
