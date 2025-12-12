@@ -250,25 +250,25 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
-          # Use a reporter that creates a results file (e.g., junit)
           reporter: junit
-          # Configure reporter options to output to a specific file
-          reporter-options: 'mochaFile=cypress/results/test-results-[hash].xml'
+          reporter-options: 'mochaFile=cypress/results/test-results.xml'
         env:
           CYPRESS_BASE_URL: ${{ secrets.PRODUCTION_URL }}
 
-      - name: Process Cypress test results
-        id: process_results
-        uses: im-open/process-cypress-test-results@v1
+      - name: Parse test results
+        id: parse_results
+        uses: dorny/test-reporter@v1
         with:
-          path: cypress/results/test-results-*.xml
+          name: Cypress Tests
+          path: cypress/results/*.xml
+          reporter: junit
 
       - name: Get counts and use them
         run: |
-          echo "Total Passed: ${{ steps.process_results.outputs.testsPassed }}"
-          echo "Total Failed: ${{ steps.process_results.outputs.testsFailed }}"
+          echo "Total Passed: ${{ steps.parse_results.outputs.testsPassed }}"
+          echo "Total Failed: ${{ steps.parse_results.outputs.testsFailed }}"
           # You can use these counts for other actions (e.g., sending notifications
-          echo "Total Failed: ${{ steps.process_results.outputs }}"
+          echo "Total Failed: ${{ steps.parse_results.outputs }}"
 
       - name: Generate Report
         if: always()
