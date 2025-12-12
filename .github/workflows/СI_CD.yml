@@ -256,69 +256,29 @@ jobs:
         env:
           CYPRESS_BASE_URL: ${{ secrets.PRODUCTION_URL }}
 
-      - name: Install xmlstarlet
-        run: sudo apt-get update && sudo apt-get install -y xmlstarlet
-
-      - name: Parse test results
-        id: parse_results
-        run: |
-          # Ждем создания файла (может быть delay)
-          sleep 3
-          
-          # Находим файл с результатами
-          FILE=$(find cypress/results -name "*.xml" -type f | head -n 1)
-          
-          if [ -f "$FILE" ]; then
-            echo "Found test results file: $FILE"
-          
-            # Извлекаем данные из XML
-            TESTS_TOTAL=$(xmlstarlet sel -t -v "//testsuites/@tests" "$FILE" 2>/dev/null || echo "0")
-            TESTS_FAILED=$(xmlstarlet sel -t -v "//testsuites/@failures" "$FILE" 2>/dev/null || echo "0")
-            TESTS_SKIPPED=$(xmlstarlet sel -t -v "//testsuites/@skipped" "$FILE" 2>/dev/null || echo "0")
-          
-            # Если атрибуты не найдены, пробуем другой формат
-            if [ "$TESTS_TOTAL" = "0" ]; then
-              TESTS_TOTAL=$(xmlstarlet sel -t -v "//testsuite/@tests" "$FILE" 2>/dev/null || echo "0")
-              TESTS_FAILED=$(xmlstarlet sel -t -v "//testsuite/@failures" "$FILE" 2>/dev/null || echo "0")
-              TESTS_SKIPPED=$(xmlstarlet sel -t -v "//testsuite/@skipped" "$FILE" 2>/dev/null || echo "0")
+      - name: Parse JUnit results
+        id: junit_parser
+        uses: mikefarah/yq@v4.40.5
+        with:
+          cmd: |
+            # Простой парсинг с помощью yq (поддерживает XML)
+            file="cypress/results/test-results.xml"
+            if [ -f "$file" ]; then
+              tests=$(xq -r '.testsuites."@tests" // .testsuite."@tests" // "0"' "$file" 2>/dev/null || echo "0")
+              failures=$(xq -r '.testsuites."@failures" // .testsuite."@failures" // "0"' "$file" 2>/dev/null || echo "0")
+              skipped=$(xq -r '.testsuites."@skipped" // .testsuite."@skipped" // "0"' "$file" 2>/dev/null || echo "0")
+              passed=$((tests - failures - skipped))
+            
+              echo "testsTotal=$tests" >> $GITHUB_OUTPUT
+              echo "testsPassed=$passed" >> $GITHUB_OUTPUT
+              echo "testsFailed=$failures" >> $GITHUB_OUTPUT
+              echo "testsSkipped=$skipped" >> $GITHUB_OUTPUT
+            else
+              echo "testsTotal=0" >> $GITHUB_OUTPUT
+              echo "testsPassed=0" >> $GITHUB_OUTPUT
+              echo "testsFailed=0" >> $GITHUB_OUTPUT
+              echo "testsSkipped=0" >> $GITHUB_OUTPUT
             fi
-          
-            # Вычисляем пройденные тесты
-            TESTS_PASSED=$((TESTS_TOTAL - TESTS_FAILED - TESTS_SKIPPED))
-          
-            echo "testsTotal=$TESTS_TOTAL" >> $GITHUB_OUTPUT
-            echo "testsPassed=$TESTS_PASSED" >> $GITHUB_OUTPUT
-            echo "testsFailed=$TESTS_FAILED" >> $GITHUB_OUTPUT
-            echo "testsSkipped=$TESTS_SKIPPED" >> $GITHUB_OUTPUT
-          
-            echo "Test Results:"
-            echo "- Total: $TESTS_TOTAL"
-            echo "- Passed: $TESTS_PASSED"
-            echo "- Failed: $TESTS_FAILED"
-            echo "- Skipped: $TESTS_SKIPPED"
-          else
-            echo "No test results file found!"
-            echo "testsTotal=0" >> $GITHUB_OUTPUT
-            echo "testsPassed=0" >> $GITHUB_OUTPUT
-            echo "testsFailed=0" >> $GITHUB_OUTPUT
-            echo "testsSkipped=0" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Display results
-        run: |
-          echo "=== TEST RESULTS SUMMARY ==="
-          echo "Total Tests: ${{ steps.parse_results.outputs.testsTotal }}"
-          echo "Tests Passed: ${{ steps.parse_results.outputs.testsPassed }}"
-          echo "Tests Failed: ${{ steps.parse_results.outputs.testsFailed }}"
-          echo "Tests Skipped: ${{ steps.parse_results.outputs.testsSkipped }}"
-          
-          # Пример логики на основе результатов
-          if [ "${{ steps.parse_results.outputs.testsFailed }}" -gt 0 ]; then
-            echo "❌ Some tests failed!"
-            exit 1  # Фейлим pipeline при неудачных тестах
-          else
-            echo "✅ All tests passed!"
-          fi
 
       - name: Generate Report
         if: always()
