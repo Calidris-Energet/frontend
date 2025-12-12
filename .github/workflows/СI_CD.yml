@@ -175,15 +175,12 @@ jobs:
             🔗 Ссылка на пайплайн 🔗
             ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-  integration-tests:
+  integration-tests-run:
     runs-on: ubuntu-latest
     needs: install-cache
-
     permissions:
-      contents: write
-      pull-requests: write
-      pages: write
-      id-token: write
+      contents: read
+      pull-requests: read
 
     steps:
       - name: Checkout Commit
@@ -214,24 +211,40 @@ jobs:
         if: always()
         run: npm run allure:generate
 
-      - name: Publishing Allure artifact to Github Actions
-        uses: actions/upload-artifact@master
+      - name: Upload Allure results artifact
         if: always()
+        uses: actions/upload-artifact@master
         with:
-          name: allure-report
-          path: allure-report/
+          name: allure-results
+          path: |
+            allure-results/
+            allure-report/
+          retention-days: 7
+
+  deploy-allure-report:
+    runs-on: ubuntu-latest
+    needs: integration-tests-run
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Download Allure results artifact
+        uses: actions/download-artifact@master
+        with:
+          name: allure-results
+          path: ./
 
       - name: Get Allure history
         uses: actions/checkout@master
-        if: always()
         continue-on-error: true
         with:
           ref: gh-pages
           path: gh-pages
 
-      - name: Test marketplace action
+      - name: Generate and publish Allure report
         uses: simple-elf/allure-report-action@master
-        if: always()
         id: allure-report
         with:
           allure_results: allure-results
@@ -241,23 +254,13 @@ jobs:
           keep_reports: 20
 
       - name: Deploy report to Github Pages
-        if: always()
         uses: peaceiris/actions-gh-pages@v4
         with:
           PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PUBLISH_BRANCH: gh-pages
           PUBLISH_DIR: allure-history
 
-      - name: Get Current Job Log URL
-        uses: Tiryoh/gha-jobid-action@main
-        if: failure()
-        id: jobs
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          job_name: ${{ github.job }}
-
       - name: Get Allure Report URL
-        if: failure()
         id: allure-url
         run: |
           # Формируем URL для Allure отчета
@@ -266,8 +269,8 @@ jobs:
           
           echo "report_url=https://${{ secrets.ALLURE_URL }}/$REPORT_DIR/" >> $GITHUB_OUTPUT
 
-      - name: Send Telegram Error Message
-        if: failure()
+      - name: Send Telegram Report Status
+        if: needs.integration-tests-run.result == 'failure'
         uses: PacificPromise/macos-telegram-action@main
         with:
           type: topic
@@ -289,7 +292,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    needs: [lint, unit-tests, integration-tests]
+    needs: [lint, unit-tests, deploy-allure-report]
 
     steps:
       - name: Pull code
