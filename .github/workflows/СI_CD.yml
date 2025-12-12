@@ -227,12 +227,6 @@ jobs:
       pull-requests: read
       checks: write
 
-    outputs:
-      total: ${{ steps.parse-report.outputs.total }}
-      passed: ${{ steps.parse-report.outputs.passed }}
-      failed: ${{ steps.parse-report.outputs.failed }}
-      executionTime: ${{ steps.parse_xml.outputs.executionTime }}
-
     steps:
       - name: Checkout Commit
         uses: actions/checkout@master
@@ -256,40 +250,6 @@ jobs:
         env:
           CYPRESS_BASE_URL: ${{ secrets.PRODUCTION_URL }}
 
-      - name: Parse and Publish Test Results
-        uses: mikepenz/action-junit-report@v6
-        id: parse-report
-        if: always()
-        with:
-          check_name: Cypress Test Results
-          report_paths: 'cypress/results/test-results-*.xml'
-          include_passed: true
-          job_summary: false
-
-      - name: Calculate total execution time from all XML files
-        id: parse_xml
-        if: always()
-        run: |
-          TOTAL_TIME=0
-          
-          for xml_file in cypress/results/test-results-*.xml; do
-            if [ -f "$xml_file" ]; then
-              root_time=$(grep -o 'testsuites.*time="[^"]*"' "$xml_file" 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2)
-              root_time=${root_time:-0}
-              
-              TOTAL_TIME=$(echo "$TOTAL_TIME + $root_time" | bc -l 2>/dev/null || echo "$TOTAL_TIME")
-            fi
-          done
-          
-          if [ -z "$TOTAL_TIME" ] || [ "$TOTAL_TIME" = "0" ]; then
-            TOTAL_TIME="0"
-            else
-            TOTAL_TIME=$(printf "%.1f" $TOTAL_TIME 2>/dev/null || echo "0")
-          fi
-          
-          echo "Total execution time: $TOTAL_TIME seconds"
-          echo "executionTime=$TOTAL_TIME" >> $GITHUB_OUTPUT
-
       - name: Generate Report
         if: always()
         run: npm run allure:generate
@@ -302,6 +262,7 @@ jobs:
           path: |
             allure-results/
             allure-report/
+            cypress/results/test-results-*.xml
           retention-days: 7
 
   deploy-allure-report:
@@ -353,6 +314,40 @@ jobs:
           
           echo "report_url=https://${{ secrets.ALLURE_URL }}/$REPORT_DIR/" >> $GITHUB_OUTPUT
 
+      - name: Parse and Publish Test Results
+        uses: mikepenz/action-junit-report@v6
+        id: parse-report
+        if: always()
+        with:
+          check_name: Cypress Test Results
+          report_paths: 'cypress/results/test-results-*.xml'
+          include_passed: true
+          job_summary: false
+
+      - name: Calculate total execution time from all XML files
+        id: parse_xml
+        if: always()
+        run: |
+          TOTAL_TIME=0
+          
+          for xml_file in cypress/results/test-results-*.xml; do
+            if [ -f "$xml_file" ]; then
+              root_time=$(grep -o 'testsuites.*time="[^"]*"' "$xml_file" 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2)
+              root_time=${root_time:-0}
+          
+              TOTAL_TIME=$(echo "$TOTAL_TIME + $root_time" | bc -l 2>/dev/null || echo "$TOTAL_TIME")
+            fi
+          done
+          
+          if [ -z "$TOTAL_TIME" ] || [ "$TOTAL_TIME" = "0" ]; then
+            TOTAL_TIME="0"
+            else
+            TOTAL_TIME=$(printf "%.1f" $TOTAL_TIME 2>/dev/null || echo "0")
+          fi
+          
+          echo "Total execution time: $TOTAL_TIME seconds"
+          echo "executionTime=$TOTAL_TIME" >> $GITHUB_OUTPUT
+
       - name: Send Telegram Report Status
         uses: PacificPromise/macos-telegram-action@main
         with:
@@ -360,10 +355,10 @@ jobs:
           message: |
             ${{ needs.integration-tests-run.result == 'success' && '✅ Tests passing' || '❌ Tests failed' }}
             
-            🧪 Total: ${{needs.integration-tests-run.outputs.total}}
-            ❌ Failed: ${{needs.integration-tests-run.outputs.failed}}
-            ✅ Passed: ${{needs.integration-tests-run.outputs.passed}}
-            ⏱️ Duration: ${{needs.integration-tests-run.outputs.executionTime}} s
+            🧪 Total: ${{steps.parse-report.outputs.total}}
+            ❌ Failed: ${{steps.parse-report.outputs.failed}}
+            ✅ Passed: ${{steps.parse-report.outputs.passed}}
+            ⏱️ Duration: ${{steps.parse_xml.outputs.executionTime}} s
             
             📊 Allure
             ${{ steps.allure-url.outputs.report_url }}
