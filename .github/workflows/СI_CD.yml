@@ -252,33 +252,19 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
-          command: npx cypress run --reporter junit --reporter-options mochaFile=cypress/results/test-results.xml
+          command: npx cypress run --reporter junit --reporter-options 'mochaFile=cypress-report.xml'
         env:
           CYPRESS_BASE_URL: ${{ secrets.PRODUCTION_URL }}
 
-      - name: Parse JUnit results
-        id: junit_parser
-        uses: mikefarah/yq@v4.40.5
+      - name: Parse and Publish Test Results
+        uses: mikepenz/action-junit-report@v4
+        id: parse-report
         with:
-          cmd: |
-            # Простой парсинг с помощью yq (поддерживает XML)
-            file="cypress/results/test-results.xml"
-            if [ -f "$file" ]; then
-              tests=$(xq -r '.testsuites."@tests" // .testsuite."@tests" // "0"' "$file" 2>/dev/null || echo "0")
-              failures=$(xq -r '.testsuites."@failures" // .testsuite."@failures" // "0"' "$file" 2>/dev/null || echo "0")
-              skipped=$(xq -r '.testsuites."@skipped" // .testsuite."@skipped" // "0"' "$file" 2>/dev/null || echo "0")
-              passed=$((tests - failures - skipped))
-            
-              echo "testsTotal=$tests" >> $GITHUB_OUTPUT
-              echo "testsPassed=$passed" >> $GITHUB_OUTPUT
-              echo "testsFailed=$failures" >> $GITHUB_OUTPUT
-              echo "testsSkipped=$skipped" >> $GITHUB_OUTPUT
-            else
-              echo "testsTotal=0" >> $GITHUB_OUTPUT
-              echo "testsPassed=0" >> $GITHUB_OUTPUT
-              echo "testsFailed=0" >> $GITHUB_OUTPUT
-              echo "testsSkipped=0" >> $GITHUB_OUTPUT
-            fi
+          check_name: Cypress Test Results
+          report_paths: 'cypress-report.xml'
+
+      - name: Parse and Publish Test Results
+        run: echo ${{steps.parse-report.outputs.total}}
 
       - name: Generate Report
         if: always()
