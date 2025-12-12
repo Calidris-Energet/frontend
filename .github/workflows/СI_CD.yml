@@ -267,7 +267,6 @@ jobs:
     permissions:
       contents: write
       pages: write
-      id-token: write
 
     steps:
       - name: Download results artifact
@@ -314,7 +313,7 @@ jobs:
           check_name: Cypress Test Results
           report_paths: 'cypress/results/test-results-*.xml'
           include_passed: true
-          job_summary: false
+          comment: false
 
       - name: Calculate total execution time from all XML files
         id: parse_xml
