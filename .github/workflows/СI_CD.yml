@@ -232,6 +232,8 @@ jobs:
     outputs:
       total: ${{ steps.parse-report.outputs.total }}
       passed: ${{ steps.parse-report.outputs.passed }}
+      failed: ${{ steps.parse-report.outputs.failed }}
+      skipped: ${{ steps.parse-report.outputs.skipped }}
 
     steps:
       - name: Checkout Commit
@@ -265,9 +267,8 @@ jobs:
           check_name: Cypress Test Results
           report_paths: 'cypress/results/test-results.xml'
           include_passed: true
-
-      - name: Parse and Publish Test Results
-        run: echo ${{steps.parse-report.outputs.total}}
+          include_skipped: true
+          job_summary: false
 
       - name: Generate Report
         if: always()
@@ -344,8 +345,10 @@ jobs:
             🔹 Workflow: ${{ github.workflow }}
             🔹 Job: ${{ github.job }}
             🔹 Environment: production
-            
-            ${{needs.integration-tests-run.outputs.passed}} / ${{needs.integration-tests-run.outputs.total}}
+            🔹 Total: ${{needs.integration-tests-run.outputs.total}}
+            🔹 Passed: ${{needs.integration-tests-run.outputs.total}}
+            🔹 Failed: ${{needs.integration-tests-run.outputs.failed}}
+            🔹 Skipped: ${{needs.integration-tests-run.outputs.skipped}}
             
             📊 Allure отчет
             ${{ steps.allure-url.outputs.report_url }}
@@ -365,6 +368,10 @@ jobs:
             🔹 Workflow: ${{ github.workflow }}
             🔹 Job: ${{ github.job }}
             🔹 Environment: production
+            🔹 Total: ${{needs.integration-tests-run.outputs.total}}
+            🔹 Passed: ${{needs.integration-tests-run.outputs.total}}
+            🔹 Failed: ${{needs.integration-tests-run.outputs.failed}}
+            🔹 Skipped: ${{needs.integration-tests-run.outputs.skipped}}
             
             📊 Allure отчет
             ${{ steps.allure-url.outputs.report_url }}
