@@ -261,6 +261,7 @@ jobs:
       - name: Parse and Publish Test Results
         uses: mikepenz/action-junit-report@v6
         id: parse-report
+        if: always()
         with:
           check_name: Cypress Test Results
           report_paths: 'cypress/results/test-results-*.xml'
@@ -269,6 +270,7 @@ jobs:
 
       - name: Calculate total execution time from all XML files
         id: parse_xml
+        if: always()
         run: |
           TOTAL_TIME=0
           
