@@ -234,7 +234,7 @@ jobs:
       passed: ${{ steps.parse-report.outputs.passed }}
       failed: ${{ steps.parse-report.outputs.failed }}
       skipped: ${{ steps.parse-report.outputs.skipped }}
-      executionTime: ${{ steps.parse-report.outputs.executionTime }}
+      executionTime: ${{ steps.parse_xml.outputs.executionTime }}
 
     steps:
       - name: Checkout Commit
