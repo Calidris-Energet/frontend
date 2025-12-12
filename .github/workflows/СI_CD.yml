@@ -272,7 +272,7 @@ jobs:
 
       - name: Parse XML with jq
         id: parse_xml
-        uses: sergeysova/jq-action@v2
+        uses: davidmason/jq-action@v2
         with:
           cmd: |
             # Читаем XML файл и парсим как текст
