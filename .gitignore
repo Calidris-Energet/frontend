@@ -26,3 +26,4 @@ dist-ssr
 .env.production
 
 allure-results
+cypress/results
