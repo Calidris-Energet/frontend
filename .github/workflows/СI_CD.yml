@@ -200,13 +200,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-npm-
 
-      - name: Cypress run
-        uses: cypress-io/github-action@v6
-        with:
-          start: npm run dev
-          wait-on: 'http://localhost:3000'
-          browser: chrome
-          command: npx cypress run --reporter json --reporter-options '{"output":"cypress-report.json"}'
+      - name: Start dev server
+        run: npm run dev
+
+      - name: Wait for server
+        run: npx wait-on http://localhost:3000
+
+      - name: Run Cypress with JSON reporter
+        id: run-cypress
+        run: |
+          # Запускаем Cypress с JSON репортером
+          npx cypress run --reporter json --reporter-options '{"output":"cypress-report.json"}'
+        continue-on-error: true  # Важно: продолжаем даже если тесты упали
 
       - name: Parse test results
         id: parse-test-results
