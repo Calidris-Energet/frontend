@@ -224,6 +224,14 @@ jobs:
             allure-report/
           retention-days: 7
 
+      - name: Get Current Job Log URL
+        uses: Tiryoh/gha-jobid-action@main
+        if: failure()
+        id: jobs
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          job_name: ${{ github.job }}
+
   deploy-allure-report:
     runs-on: ubuntu-latest
     needs: integration-tests-run
