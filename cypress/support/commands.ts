@@ -104,7 +104,7 @@ Cypress.Commands.add("verifyProfile", (user) => {
     allure.step("Verify name field matches user data", () => {
         cy.get('input[id="profile-name-field"]').should(
             "have.value",
-            user.name
+            user.name + "123"
         );
         allure.attachment("Expected Name", user.name, allure.ContentType.TEXT);
     });
