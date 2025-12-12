@@ -249,7 +249,6 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
-          install: false
           browser: chrome
         env:
           CYPRESS_BASE_URL: https://energet.shop/
