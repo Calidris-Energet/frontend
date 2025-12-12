@@ -256,6 +256,16 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           job_name: ${{ github.job }}
 
+      - name: Get Allure Report URL
+        if: always()
+        id: allure-url
+        run: |
+          # Формируем URL для Allure отчета
+          # Определяем имя папки с отчетом (обычно это номер прогона)
+          REPORT_DIR="${{ github.run_number }}"
+          
+          echo "report_url=https://allure.energet.shop/$REPORT_DIR" >> $GITHUB_OUTPUT
+
       - name: Send Telegram Error Message
         if: failure()
         uses: PacificPromise/macos-telegram-action@main
@@ -269,7 +279,7 @@ jobs:
             🔹 Job: ${{ github.job }}
             
             🔗 Ссылка на аллюр 🔗
-            https://allure.energet.shop
+            ${{ steps.allure-url.outputs.report_url }}
             
             🔗 Ссылка на джобу 🔗
             ${{ steps.jobs.outputs.html_url }}
