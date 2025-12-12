@@ -370,28 +370,11 @@ jobs:
           echo "report_url=https://${{ secrets.ALLURE_URL }}/$REPORT_DIR/" >> $GITHUB_OUTPUT
 
       - name: Send Telegram Report Status
-        if: needs.integration-tests-run.result == 'success'
         uses: PacificPromise/macos-telegram-action@main
         with:
           type: topic
           message: |
-            ✅️ Tests passing 
-            
-            🧪 Total: ${{needs.integration-tests-run.outputs.total}}
-            ❌ Failed: ${{needs.integration-tests-run.outputs.failed}}
-            ✅ Passed: ${{needs.integration-tests-run.outputs.total}}
-            ⏱️ Duration: ${{needs.integration-tests-run.outputs.executionTime}} s
-            
-            📊 Allure
-            ${{ steps.allure-url.outputs.report_url }}
-
-      - name: Send Telegram Report Status
-        if: needs.integration-tests-run.result == 'failure'
-        uses: PacificPromise/macos-telegram-action@main
-        with:
-          type: topic
-          message: |
-            ❌ Tests failed
+            ${{ needs.integration-tests-run.result == 'success' && '✅ Tests passing' || '❌ Tests failed' }}
             
             🧪 Total: ${{needs.integration-tests-run.outputs.total}}
             ❌ Failed: ${{needs.integration-tests-run.outputs.failed}}
