@@ -230,6 +230,9 @@ jobs:
       id-token: write
       checks: write
 
+    outputs:
+      parse-report: ${{ steps.parse-report.outputs }}
+
     steps:
       - name: Checkout Commit
         uses: actions/checkout@master
@@ -342,6 +345,8 @@ jobs:
             🔹 Workflow: ${{ github.workflow }}
             🔹 Job: ${{ github.job }}
             🔹 Environment: production
+            
+            ${{needs.integration-tests-run.outputs.parse-report.passed}} / ${{needs.integration-tests-run.outputs.parse-report.total}}
             
             📊 Allure отчет
             ${{ steps.allure-url.outputs.report_url }}
