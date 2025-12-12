@@ -227,11 +227,11 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
-      id-token: write
       checks: write
 
     outputs:
-      parse-report: ${{ steps.parse-report.outputs }}
+      total: ${{ steps.parse-report.outputs.total
+      passed: ${{ steps.parse-report.outputs.passed }}
 
     steps:
       - name: Checkout Commit
@@ -281,7 +281,6 @@ jobs:
           path: |
             allure-results/
             allure-report/
-            cypress-report.json
           retention-days: 7
 
   deploy-allure-report:
@@ -346,7 +345,7 @@ jobs:
             🔹 Job: ${{ github.job }}
             🔹 Environment: production
             
-            ${{needs.integration-tests-run.outputs.parse-report.passed}} / ${{needs.integration-tests-run.outputs.parse-report.total}}
+            ${{needs.integration-tests-run.outputs.passed}} / ${{needs.integration-tests-run.outputs.total}}
             
             📊 Allure отчет
             ${{ steps.allure-url.outputs.report_url }}
