@@ -270,26 +270,41 @@ jobs:
           include_skipped: true
           job_summary: false
 
-      - name: Parse XML with jq
+      - name: Parse XML and calculate execution time
         id: parse_xml
-        uses: davidmason/jq-action@v2
+        uses: sergeysova/jq-action@v2
         with:
           cmd: |
-            # Читаем XML файл и парсим как текст
-            xml_content=$(cat cypress/results/test-results.xml)
-            
-            # Используем jq для парсинга XML через regex
-            time=$(echo "$xml_content" | grep -o 'testsuites.*time="[^"]*"' | grep -o 'time="[^"]*"' | cut -d'"' -f2)
-            
-            # Если время не найдено, ищем в testsuite
-            if [ -z "$time" ]; then
-              time=$(echo "$xml_content" | grep -o 'testsuite.*time="[^"]*"' | grep -o 'time="[^"]*"' | cut -d'"' -f2 | head -1)
+            # Проверяем наличие файла
+            if [ ! -f "cypress/results/test-results.xml" ]; then
+              echo "executionTime=0"
+              echo "testsTotal=0"
+              exit 0
             fi
             
-            # Если все еще нет времени, устанавливаем 0
-            time=${time:-0}
+            echo "=== Parsing test results XML ==="
             
-            echo "executionTime=$time"
+            # Извлекаем время из корневого элемента testsuites
+            root_time=$(grep -o 'testsuites.*time="[^"]*"' cypress/results/test-results.xml 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2)
+            echo "Root time: $root_time"
+            
+            # Если время в корне не найдено или равно 0, суммируем время всех testsuite
+            if [ -z "$root_time" ] || [ "$root_time" = "0" ] || [ "$root_time" = "0.000" ]; then
+              echo "Calculating total time from testsuite elements..."
+            
+              # Используем awk для суммирования всех времен testsuite
+              total_time=$(grep -o 'testsuite.*time="[^"]*"' cypress/results/test-results.xml 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2 | awk '{sum += $1} END {printf "%.3f", sum}')
+            
+              if [ -z "$total_time" ]; then
+                total_time="0"
+              fi
+            
+              execution_time=$total_time
+            else
+              execution_time=$root_time
+            fi
+            
+            echo "Total execution time: $execution_time seconds"
 
       - name: Generate Report
         if: always()
