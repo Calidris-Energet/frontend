@@ -230,7 +230,7 @@ jobs:
       checks: write
 
     outputs:
-      total: ${{ steps.parse-report.outputs.total
+      total: ${{ steps.parse-report.outputs.total }}
       passed: ${{ steps.parse-report.outputs.passed }}
 
     steps:
