@@ -257,11 +257,12 @@ jobs:
           CYPRESS_BASE_URL: ${{ secrets.PRODUCTION_URL }}
 
       - name: Parse and Publish Test Results
-        uses: mikepenz/action-junit-report@v4
+        uses: mikepenz/action-junit-report@v6
         id: parse-report
         with:
           check_name: Cypress Test Results
           report_paths: 'cypress-report.xml'
+          include_passed: true
 
       - name: Parse and Publish Test Results
         run: echo ${{steps.parse-report.outputs.total}}
