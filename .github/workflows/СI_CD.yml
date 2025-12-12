@@ -176,7 +176,6 @@ jobs:
             🔗 Ссылка на пайплайн
             ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-
   deploy:
     runs-on: ubuntu-latest
     needs: [lint, unit-tests]
@@ -273,21 +272,12 @@ jobs:
       - name: Calculate total execution time from all XML files
         id: parse_xml
         run: |
-          echo "=== Calculating total execution time from all test files ==="
-          
-          # Инициализируем переменные
           TOTAL_TIME=0
           
-          # Обрабатываем каждый XML файл
           for xml_file in cypress/results/test-results-*.xml; do
             if [ -f "$xml_file" ]; then
-              FILE_COUNT=$((FILE_COUNT + 1))
-              echo "Processing file: $xml_file"
-          
-              # Извлекаем время из корневого элемента testsuites
               root_time=$(grep -o 'testsuites.*time="[^"]*"' "$xml_file" 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2)
            
-              # Если время в корне не найдено или равно 0, суммируем время всех testsuite
               if [ -z "$root_time" ] || [ "$root_time" = "0" ] || [ "$root_time" = "0.000" ]; then
                 # Используем awk для суммирования всех времен testsuite
                 file_time=$(grep -o 'testsuite.*time="[^"]*"' "$xml_file" 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2 | awk '{sum += $1} END {printf "%.3f", sum}')
@@ -296,27 +286,21 @@ jobs:
                 file_time=$root_time
               fi
           
-              # Суммируем общие значения
               TOTAL_TIME=$(echo "$TOTAL_TIME + $file_time" | bc -l 2>/dev/null || echo "$TOTAL_TIME")
-          
-              echo "  File time: $file_time seconds"
             fi
           done
           
-          # Форматируем общее время
           if [ -z "$TOTAL_TIME" ] || [ "$TOTAL_TIME" = "0" ]; then
             TOTAL_TIME="0"
           else
-            TOTAL_TIME=$(printf "%.3f" $TOTAL_TIME 2>/dev/null || echo "0")
+            TOTAL_TIME=$(printf "%.1f" $TOTAL_TIME 2>/dev/null || echo "0")
           fi
           
           echo "=== SUMMARY ==="
           echo "Total execution time: $TOTAL_TIME seconds"
           
-          # Сохраняем результаты
           echo "executionTime=$TOTAL_TIME" >> $GITHUB_OUTPUT
           
-          # Если файлов не найдено
           if [ $FILE_COUNT -eq 0 ]; then
             echo "No test result files found!"
             echo "executionTime=0" >> $GITHUB_OUTPUT
@@ -391,23 +375,15 @@ jobs:
         with:
           type: topic
           message: |
-            ✅️ Тесты прошли успешно
+            ✅️ ${{ github.repository }}
             
-            🔹 Repo: ${{ github.repository }}
-            🔹 Workflow: ${{ github.workflow }}
-            🔹 Job: ${{ github.job }}
-            🔹 Environment: production
-            🔹 Total: ${{needs.integration-tests-run.outputs.total}}
-            🔹 Passed: ${{needs.integration-tests-run.outputs.total}}
-            🔹 Failed: ${{needs.integration-tests-run.outputs.failed}}
-            🔹 Skipped: ${{needs.integration-tests-run.outputs.skipped}}
-            🔹 Execution Time: ${{needs.integration-tests-run.outputs.executionTime}} s
+            ⏱️ Execution Time: ${{needs.integration-tests-run.outputs.executionTime}} s
+            🧪 Total: ${{needs.integration-tests-run.outputs.total}}
+            ❌ Failed: ${{needs.integration-tests-run.outputs.failed}}
+            ✅ Passed: ${{needs.integration-tests-run.outputs.total}}
             
             📊 Allure отчет
             ${{ steps.allure-url.outputs.report_url }}
-            
-            🔗 Ссылка на пайплайн
-            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Send Telegram Report Status
         if: needs.integration-tests-run.result == 'failure'
@@ -415,20 +391,12 @@ jobs:
         with:
           type: topic
           message: |
-            ❗ Произошла ошибка во время прогона тестов
+            ❗ ${{ github.repository }}
             
-            🔹 Repo: ${{ github.repository }}
-            🔹 Workflow: ${{ github.workflow }}
-            🔹 Job: ${{ github.job }}
-            🔹 Environment: production
-            🔹 Total: ${{needs.integration-tests-run.outputs.total}}
-            🔹 Passed: ${{needs.integration-tests-run.outputs.total}}
-            🔹 Failed: ${{needs.integration-tests-run.outputs.failed}}
-            🔹 Skipped: ${{needs.integration-tests-run.outputs.skipped}}
-            🔹 Execution Time: ${{needs.integration-tests-run.outputs.executionTime}}
+            ⏱️ Execution Time: ${{needs.integration-tests-run.outputs.executionTime}} s
+            🧪 Total: ${{needs.integration-tests-run.outputs.total}}
+            ❌ Failed: ${{needs.integration-tests-run.outputs.failed}}
+            ✅ Passed: ${{needs.integration-tests-run.outputs.total}}
             
             📊 Allure отчет
             ${{ steps.allure-url.outputs.report_url }}
-            
-            🔗 Ссылка на пайплайн
-            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
