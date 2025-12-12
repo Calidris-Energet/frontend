@@ -270,6 +270,27 @@ jobs:
           include_skipped: true
           job_summary: false
 
+      - name: Parse XML with jq
+        id: parse_xml
+        uses: sergeysova/jq-action@v2
+        with:
+          cmd: |
+            # Читаем XML файл и парсим как текст
+            xml_content=$(cat cypress/results/test-results.xml)
+            
+            # Используем jq для парсинга XML через regex
+            time=$(echo "$xml_content" | grep -o 'testsuites.*time="[^"]*"' | grep -o 'time="[^"]*"' | cut -d'"' -f2)
+            
+            # Если время не найдено, ищем в testsuite
+            if [ -z "$time" ]; then
+              time=$(echo "$xml_content" | grep -o 'testsuite.*time="[^"]*"' | grep -o 'time="[^"]*"' | cut -d'"' -f2 | head -1)
+            fi
+            
+            # Если все еще нет времени, устанавливаем 0
+            time=${time:-0}
+            
+            echo "executionTime=$time"
+
       - name: Generate Report
         if: always()
         run: npm run allure:generate
