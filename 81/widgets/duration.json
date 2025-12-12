@@ -1,0 +1,1 @@
+[{"uid":"62d07f2527b948cc","name":"Успешная авторизация и проверка данных профиля","time":{"start":1765567422538,"stop":1765567426250,"duration":3712},"status":"passed","severity":"blocker"},{"uid":"6a07d11cdffa5d32","name":"Успешная регистрация и проверка данных профиля","time":{"start":1765567427986,"stop":1765567431022,"duration":3036},"status":"passed","severity":"blocker"}]
