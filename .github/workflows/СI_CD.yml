@@ -278,15 +278,6 @@ jobs:
             # Извлекаем время из корневого элемента testsuites
             root_time=$(grep -o 'testsuites.*time="[^"]*"' cypress/results/test-results.xml 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2)
           
-            # Если время в корне не найдено или равно 0, суммируем время всех testsuite
-            if [ -z "$root_time" ] || [ "$root_time" = "0" ] || [ "$root_time" = "0.000" ]; then
-              # Используем awk для суммирования всех времен testsuite
-              execution_time=$(grep -o 'testsuite.*time="[^"]*"' cyppress/results/test-results.xml 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2 | awk '{sum += $1} END {printf "%.3f", sum}')
-              execution_time=${execution_time:-0}
-            else
-              execution_time=$root_time
-            fi
-          
             echo "executionTime=$execution_time" >> $GITHUB_OUTPUT
           
             echo "Execution time: $execution_time seconds"
@@ -373,7 +364,7 @@ jobs:
             🔹 Passed: ${{needs.integration-tests-run.outputs.total}}
             🔹 Failed: ${{needs.integration-tests-run.outputs.failed}}
             🔹 Skipped: ${{needs.integration-tests-run.outputs.skipped}}
-            🔹 Execution Time: ${{needs.integration-tests-run.outputs.executionTime}}
+            🔹 Execution Time: ${{needs.integration-tests-run.outputs.executionTime}} s
             
             📊 Allure отчет
             ${{ steps.allure-url.outputs.report_url }}
