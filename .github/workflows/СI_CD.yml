@@ -234,6 +234,7 @@ jobs:
       passed: ${{ steps.parse-report.outputs.passed }}
       failed: ${{ steps.parse-report.outputs.failed }}
       skipped: ${{ steps.parse-report.outputs.skipped }}
+      execution_time: ${{ steps.parse-report.outputs.execution_time }}
 
     steps:
       - name: Checkout Commit
@@ -287,6 +288,8 @@ jobs:
             
             # Если время в корне не найдено или равно 0, суммируем время всех testsuite
             if [ -z "$root_time" ] || [ "$root_time" = "0" ] || [ "$root_time" = "0.000" ]; then
+              echo "Calculating total time from testsuite elements..."
+            
               # Используем awk для суммирования всех времен testsuite
               total_time=$(grep -o 'testsuite.*time="[^"]*"' cypress/results/test-results.xml 2>/dev/null | grep -o 'time="[^"]*"' | cut -d'"' -f2 | awk '{sum += $1} END {printf "%.3f", sum}')
             
@@ -299,7 +302,7 @@ jobs:
               execution_time=$root_time
             fi
             
-            echo "executionTime=$execution_time"
+            echo "execution_time=$execution_time seconds" >> "$GITHUB_OUTPUT"
 
       - name: Generate Report
         if: always()
@@ -380,6 +383,7 @@ jobs:
             🔹 Passed: ${{needs.integration-tests-run.outputs.total}}
             🔹 Failed: ${{needs.integration-tests-run.outputs.failed}}
             🔹 Skipped: ${{needs.integration-tests-run.outputs.skipped}}
+            🔹 Execution Time: ${{needs.integration-tests-run.outputs.execution_time}}
             
             📊 Allure отчет
             ${{ steps.allure-url.outputs.report_url }}
