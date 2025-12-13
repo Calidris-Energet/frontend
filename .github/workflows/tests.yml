@@ -143,13 +143,29 @@ jobs:
           PUBLISH_BRANCH: gh-pages
           PUBLISH_DIR: allure-history
 
+  send-telegramm-message:
+    runs-on: ubuntu-latest
+    needs: deploy-allure-report
+    if: always()
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Download results artifact
+        uses: actions/download-artifact@master
+        with:
+          name: allure-results
+          path: ./
+
       - name: Get Allure Report URL
         id: allure-url
         run: |
           REPORT_DIR="${{ github.run_number }}"
           echo "report_url=https://${{ secrets.ALLURE_URL }}/$REPORT_DIR/" >> $GITHUB_OUTPUT
 
-      - name: Parse and Publish Test Results
+      - name: Parse Test Results
         uses: mikepenz/action-junit-report@v6
         id: parse-report
         if: always()
