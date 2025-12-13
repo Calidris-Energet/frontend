@@ -1,4 +1,4 @@
-import { RouteMock } from "../../fixtures/types";
+import { RouteMock } from "fixtures/types";
 
 export class MockUtils {
     static intercept(mock: RouteMock) {
