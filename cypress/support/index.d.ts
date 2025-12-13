@@ -4,7 +4,9 @@
 declare global {
     namespace Cypress {
         interface Chainable {
-            setupAuthMocks(): Chainable<void>;
+            setupAuthMocks(
+                authState: "authorized" | "unauthorized"
+            ): Chainable<void>;
             login(email: string, password: string): Chainable<void>;
             register(
                 name: string,

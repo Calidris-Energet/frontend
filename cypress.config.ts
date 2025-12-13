@@ -1,4 +1,7 @@
+// eslint-disable-next-line
+// @ts-ignore
 import { allureCypress } from "allure-cypress/reporter";
+
 import { defineConfig } from "cypress";
 
 export default defineConfig({

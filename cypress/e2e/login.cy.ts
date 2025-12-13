@@ -7,7 +7,7 @@ describe("Авторизация и профиль пользователя", ()
     };
 
     beforeEach(() => {
-        cy.setupAuthMocks();
+        cy.setupAuthMocks("unauthorized");
         cy.viewport(1920, 1080);
     });
 
