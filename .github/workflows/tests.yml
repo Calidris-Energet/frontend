@@ -1,6 +1,15 @@
 on:
   workflow_dispatch:
 
+env:
+  TELEGRAM_GROUP_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+  TELEGRAM_TOPIC_ID: ${{ secrets.TELEGRAM_TOPIC_ID }}
+  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   install-cache:
     runs-on: ubuntu-latest
@@ -181,6 +190,9 @@ jobs:
           message: |
             ${{ needs.integration-tests-run.result == 'success' && '✅ Tests passing' || '❌ Tests failed' }}
             
+            📌 **Branch:** ${{ github.ref_name }}
+            👤 **Author:** ${{ github.actor }}
+      
             🧪 Total: ${{steps.parse-report.outputs.total}}
             ❌ Failed: ${{steps.parse-report.outputs.failed}}
             ✅ Passed: ${{steps.parse-report.outputs.passed}}
