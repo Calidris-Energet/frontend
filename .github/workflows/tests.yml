@@ -188,10 +188,10 @@ jobs:
         with:
           type: topic
           message: |
-            ${{ needs.integration-tests-run.result == 'success' && '✅ Tests passing' || '❌ Tests failed' }}
+            ${{ needs.integration-tests-run.result == 'success' && '✅ Tests passed' || '❌ Tests failed' }}
             
-            📌 **Branch:** ${{ github.ref_name }}
-            👤 **Author:** ${{ github.actor }}
+            📌 Branch: ${{ github.ref_name }}
+            👤 Author: ${{ github.actor }}
       
             🧪 Total: ${{steps.parse-report.outputs.total}}
             ❌ Failed: ${{steps.parse-report.outputs.failed}}
