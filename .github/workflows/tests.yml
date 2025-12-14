@@ -199,11 +199,6 @@ jobs:
           echo "Total execution time: $TOTAL_TIME seconds"
           echo "executionTime=$TOTAL_TIME" >> $GITHUB_OUTPUT
 
-      - name: Debug job result
-        run: |
-          echo "integration-tests-run result: ${{ needs.integration-tests-run.result }}"
-          echo "deploy-allure-report result: ${{ needs.deploy-allure-report.result }}"
-
       - name: Send Telegram Report Status
         uses: PacificPromise/macos-telegram-action@main
         with:
