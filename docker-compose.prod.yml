@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+      - "8111:80"
     environment:
       NODE_ENV: production
     networks:
