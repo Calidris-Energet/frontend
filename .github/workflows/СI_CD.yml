@@ -219,7 +219,7 @@ jobs:
       - name: Run Ansible playbook to deploy frontend
         working-directory: ansible
         run: |
-          ansible-playbook frontend.yml
+          ansible-playbook frontend.yml -e "server_host=${{ secrets.SERVER_HOST }}" -e “server_port=${{ secrets.SERVER_HOST }}” 
 
       - name: Send Telegram Success Message
         uses: PacificPromise/macos-telegram-action@main
