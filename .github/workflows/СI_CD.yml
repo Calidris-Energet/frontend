@@ -214,7 +214,7 @@ jobs:
           mkdir -p ~/.ssh
           cp ansible/ssh-key.pem ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H 90.156.156.169 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 90.156.156.169 -p 61487 >> ~/.ssh/known_hosts
 
       - name: Run Ansible playbook to deploy backend
         working-directory: ansible
