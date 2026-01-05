@@ -190,7 +190,6 @@ jobs:
         with:
           python-version: "3.12"
           cache: 'pip'
-          cache-dependency-path: 'requirements.txt'
 
       - name: Install Ansible and collections
         run: |
@@ -214,8 +213,8 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          cp ansible/ssh-key.pem ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          cp ansible/ssh-key.pem ~/.ssh/energet
+          chmod 600 ~/.ssh/energet
           ssh-keyscan -p "${{ secrets.SERVER_PORT }}" -H "${{ secrets.SERVER_HOST }}" >> ~/.ssh/known_hosts
 
       - name: Run Ansible playbook to deploy frontend
