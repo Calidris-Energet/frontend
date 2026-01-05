@@ -190,6 +190,14 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install Ansible and collections
         run: |
           python -m pip install --upgrade pip
@@ -216,10 +224,10 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p 61487 -H 90.156.156.169 >> ~/.ssh/known_hosts
 
-      - name: Run Ansible playbook to deploy backend
+      - name: Run Ansible playbook to deploy frontend
         working-directory: ansible
         run: |
-          ansible-playbook frontend.yaml
+          ansible-playbook frontend.yml
 
       - name: Send Telegram Success Message
         uses: PacificPromise/macos-telegram-action@main
