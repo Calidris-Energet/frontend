@@ -3,6 +3,8 @@
   vars:
     frontend_dir: /var/www/frontend
     nvm_dir: "/home/{{ ansible_user }}/.nvm"
+    telegram_bot_token: "{{ telegram_bot_token }}"
+    telegram_chat_id: "{{ telegram_chat_id }}"
 
   tasks:
     - name: Ensure front folder exists
@@ -32,3 +34,15 @@
       ansible.builtin.command:
         cmd: yarn build
         chdir: "{{ frontend_dir }}"
+
+    - name: Send notification to a specific Telegram topic
+      community.general.telegram:
+        token: "{{ telegram_bot_token }}"
+        api_method: 'sendMessage'
+        api_args:
+          chat_id: "{{ telegram_chat_id }}"
+          message_thread_id: "{{ telegram_topic_id }}"
+          text: |
+            🔔 Frontend
+            ✅ Изменения успешно задеплоены
+          parse_mode: 'markdown'
