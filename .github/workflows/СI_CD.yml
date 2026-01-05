@@ -139,11 +139,7 @@ jobs:
             ${{ runner.os }}-npm-
 
       - name: Прогон тестов
-        run: npx vitest --coverage.enabled true
-
-      - name: 'Report Coverage'
-        if: always()
-        uses:  davelosert/vitest-coverage-report-action@v2
+        run: npx vitest
 
       - name: Get Current Job Log URL
         uses: Tiryoh/gha-jobid-action@main
