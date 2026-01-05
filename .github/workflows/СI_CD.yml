@@ -200,9 +200,8 @@ jobs:
       - name: Create ansible.env with vault password and ssh key
         working-directory: ansible
         run: |
-          # Get vault password from GitHub Secrets
           echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > ansible-password.txt
-          chmod -x ansible-password.txt
+          chmod 600 ansible-password.txt
 
       - name: Decrypt the rest of ansible vault files
         working-directory: ansible
