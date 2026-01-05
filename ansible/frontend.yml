@@ -7,45 +7,50 @@
   tasks:
     - name: Start deployment
       block:
-      - name: Ensure front folder exists
-        file:
-          path: "{{ frontend_dir }}"
-          state: directory
-          owner: "{{ ansible_user }}"
-          group: "{{ ansible_user }}"
-          mode: '0755'
-        become: yes
+        - name: Test error trigger (удалите эту задачу после теста!)
+          ansible.builtin.fail:
+            msg: "Тестовая ошибка для проверки Telegram уведомления"
+          when: test_error == true
 
-      - name: Pull latest code and switch to main branch
-        git:
-          repo: "https://github.com/Calidris-Energet/frontend.git"
-          dest: "{{ frontend_dir }}"
-          update: yes
-          version: main
-          force: yes
-        become: yes
+        - name: Ensure front folder exists
+          file:
+            path: "{{ frontend_dir }}"
+            state: directory
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+            mode: '0755'
+          become: yes
 
-      - name: Install npm dependencies
-        community.general.yarn:
-          path: "{{ frontend_dir }}"
-          state: present
+        - name: Pull latest code and switch to main branch
+          git:
+            repo: "https://github.com/Calidris-Energet/frontend.git"
+            dest: "{{ frontend_dir }}"
+            update: yes
+            version: main
+            force: yes
+          become: yes
 
-      - name: Run the build script
-        ansible.builtin.command:
-          cmd: yarn build
-          chdir: "{{ frontend_dir }}"
+        - name: Install npm dependencies
+          community.general.yarn:
+            path: "{{ frontend_dir }}"
+            state: present
 
-      - name: Send notification to a specific Telegram topic
-        community.general.telegram:
-          token: "{{ telegram_bot_token }}"
-          api_method: 'sendMessage'
-          api_args:
-            chat_id: "{{ telegram_chat_id }}"
-            message_thread_id: "{{ telegram_topic_id }}"
-            text: |
-              🔔 Frontend
-              ✅ Изменения успешно задеплоены
-            parse_mode: 'markdown'
+        - name: Run the build script
+          ansible.builtin.command:
+            cmd: yarn build
+            chdir: "{{ frontend_dir }}"
+
+        - name: Send notification to a specific Telegram topic
+          community.general.telegram:
+            token: "{{ telegram_bot_token }}"
+            api_method: 'sendMessage'
+            api_args:
+              chat_id: "{{ telegram_chat_id }}"
+              message_thread_id: "{{ telegram_topic_id }}"
+              text: |
+                🔔 Frontend
+                ✅ Изменения успешно задеплоены
+              parse_mode: 'markdown'
 
       rescue:
         - name: Send failure notification to Telegram
