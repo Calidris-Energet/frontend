@@ -44,6 +44,7 @@
     "react-router-dom": "^7.1.1",
     "redux-persist": "^6.0.0",
     "sass": "^1.83.1",
+    "styled-components": "^6.1.19",
     "styled-reset": "^4.5.2",
     "stylelint-scss": "^6.10.0",
     "use-debounce": "^10.0.4",

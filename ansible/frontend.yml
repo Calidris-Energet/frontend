@@ -30,5 +30,5 @@
 
     - name: Run the build script
       ansible.builtin.command:
-        cmd: npm run build
+        cmd: yarn build
         chdir: "{{ frontend_dir }}"
