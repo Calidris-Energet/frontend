@@ -46,3 +46,23 @@
             🔔 Frontend
             ✅ Изменения успешно задеплоены
           parse_mode: 'markdown'
+
+  rescue:
+    - name: Send failure notification to Telegram
+      community.general.telegram:
+        token: "{{ telegram_bot_token }}"
+        api_method: 'sendMessage'
+        api_args:
+          chat_id: "{{ telegram_chat_id }}"
+          message_thread_id: "{{ telegram_topic_id }}"
+          text: |
+            🔔 *Frontend Deployment FAILED*
+            
+            ❌ *Произошла ошибка при деплое*
+            *Сервер:* {{ inventory_hostname }}
+            *Время:* {{ ansible_date_time.time }}
+            *Задача:* {{ ansible_failed_task.name }}
+            
+            `Ошибка: {{ ansible_failed_result.msg | default('Unknown error') }}`
+          parse_mode: 'markdown'
+          disable_notification: false
