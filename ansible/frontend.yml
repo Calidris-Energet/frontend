@@ -7,11 +7,6 @@
   tasks:
     - name: Start deployment
       block:
-        - name: Test error trigger (удалите эту задачу после теста!)
-          ansible.builtin.fail:
-            msg: "Тестовая ошибка для проверки Telegram уведомления"
-          when: test_error == true
-
         - name: Ensure front folder exists
           file:
             path: "{{ frontend_dir }}"
