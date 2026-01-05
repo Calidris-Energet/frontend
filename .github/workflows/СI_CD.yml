@@ -229,7 +229,7 @@ jobs:
           ansible-playbook frontend.yml \
             -e '{
             "server_host": "$SERVER_HOST",
-            "server_port": "$SERVER_PORT",
+            "server_port": $SERVER_PORT,
             "telegram_chat_id": "$TELEGRAM_CHAT_ID",
             "telegram_bot_token": "$TELEGRAM_TOKEN",
             "telegram_topic_id": "$TELEGRAM_TOPIC_ID",
