@@ -219,11 +219,13 @@ jobs:
       - name: Run Ansible playbook to deploy frontend
         working-directory: ansible
         run: |
-          ansible-playbook frontend.yml -e "
-          server_host=${{ secrets.SERVER_HOST }} 
-          server_port=${{ secrets.SERVER_HOST }} 
-          telegram_chat_id=${{ secrets.SERVER_HOST }} 
-          telegram_bot_token=${{ secrets.TELEGRAM_TOKEN }} 
-          telegram_topic_id=${{ secrets.TELEGRAM_TOPIC_ID }}
-          ” 
-
+          ansible-playbook frontend.yml \
+            -e '{
+            "server_host": "${{ secrets.SERVER_HOST }}",
+            "server_port": "${{ secrets.SERVER_PORT }}",
+            "telegram_chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
+            "telegram_bot_token": "${{ secrets.TELEGRAM_TOKEN }}",
+            "telegram_topic_id": "${{ secrets.TELEGRAM_TOPIC_ID }}",
+            "certbot_admin_email": "${{ secrets.CERTBOT_ADMIN_EMAIL }}"
+          }'
+          
