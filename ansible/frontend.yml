@@ -1,0 +1,34 @@
+---
+- hosts: all
+  vars:
+    frontend_dir: /var/www/frontend
+    nvm_dir: "/home/{{ ansible_user }}/.nvm"
+
+  tasks:
+    - name: Ensure front folder exists
+      file:
+        path: "{{ frontend_dir }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+      become: yes
+
+    - name: Pull latest code and switch to main branch
+      git:
+        repo: "https://github.com/Calidris-Energet/frontend.git"
+        dest: "{{ frontend_dir }}"
+        update: yes
+        version: main
+        force: yes
+      become: yes
+
+    - name: Install npm dependencies
+      community.general.yarn:
+        path: "{{ frontend_dir }}"
+        state: present
+
+    - name: Run the build script
+      ansible.builtin.command:
+        cmd: npm run build
+        chdir: "{{ frontend_dir }}"

@@ -181,31 +181,50 @@ jobs:
     needs: [lint, unit-tests]
 
     steps:
-      - name: Pull code
-        uses: appleboy/ssh-action@master
-        with:
-          port: ${{ secrets.SERVER_PORT }}
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            cd /home/energet/frontend/
-            git fetch
-            git checkout ${{ github.ref_name }}
-            git pull
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Build frontend
-        uses: appleboy/ssh-action@master
+      - name: Set up Python
+        uses: actions/setup-python@v6
         with:
-          timeout: 10m
-          port: ${{ secrets.SERVER_PORT }}
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            cd /home/energet/frontend/
-            docker compose -f docker-compose.prod.yml down -v
-            docker compose -f docker-compose.prod.yml up --build -d
+          python-version: "3.12"
+
+      - name: Install Ansible and collections
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible ansible-core
+
+          ansible-galaxy collection install community.general
+
+      - name: Create ansible.env with vault password and ssh key
+        working-directory: ansible
+        run: |
+          # Get vault password from GitHub Secrets
+          echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > ansible-password.txt
+          chmod -x ansible-password.txt
+
+      - name: Decrypt the rest of ansible vault files
+        working-directory: ansible
+        run: |
+          # Decrypt ssh key
+          ansible-vault view ssh-key.pem.vault --vault-password-file=ansible-password.txt > ssh-key.pem
+          # Make ssh-key.pem file only readable by user (required by ssh)
+          chmod 400 ssh-key.pem
+
+          # Decrypt prod.env
+          # ansible-vault view prod.env.vault --vault-password-file=vault_password.sh > prod.env
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          cp ansible/ssh-key.pem ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 90.156.156.169 >> ~/.ssh/known_hosts
+
+      - name: Run Ansible playbook to deploy backend
+        working-directory: ansible
+        run: |
+          ansible-playbook update-frontend.yaml
 
       - name: Send Telegram Success Message
         uses: PacificPromise/macos-telegram-action@main

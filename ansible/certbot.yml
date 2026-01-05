@@ -1,0 +1,26 @@
+---
+- name: Secure the site with Letsencrypt
+  hosts: all
+  become: true
+  vars:
+    admin_email: "yaroslav7689@gmail.com"
+    webroot_path: '/var/www/frontend'
+    domain_name: energet.shop
+
+  tasks:
+    - name: Install Certbot via snap (modern method)
+      include_role:
+        name: geerlingguy.certbot
+      vars:
+        certbot_admin_email: "{{ admin_email }}"
+        certbot_create_if_missing: true
+        certbot_certs:
+          - domains:
+              - "{{ domain_name }}"
+            plugin: webroot
+            webroot_path: "{{ webroot_path }}"
+        certbot_install_method: snap
+        certbot_auto_renew: true
+        certbot_auto_renew_user: "{{ ansible_user }}"
+        certbot_auto_renew_hour: 3
+        certbot_auto_renew_minute: 30
