@@ -224,13 +224,15 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_TOPIC_ID: ${{ secrets.TELEGRAM_TOPIC_ID }}
+          CERTBOT_ADMIN_EMAIL: ${{ secrets.CERTBOT_ADMIN_EMAIL }}
         run: |
           ansible-playbook frontend.yml \
             -e '{
-            "server_host": "$SERVER_HOST",
-            "server_port": "$SERVER_PORT",
-            "telegram_chat_id": "$TELEGRAM_CHAT_ID",
-            "telegram_bot_token": "$TELEGRAM_TOKEN",
-            "telegram_topic_id": "$TELEGRAM_TOPIC_ID"
+            "server_host": "${{ secrets.SERVER_HOST }}",
+            "server_port": "${{ secrets.SERVER_PORT }}",
+            "telegram_chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
+            "telegram_bot_token": "${{ secrets.TELEGRAM_TOKEN }}",
+            "telegram_topic_id": "${{ secrets.TELEGRAM_TOPIC_ID }}",
+            "certbot_admin_email": "${{ secrets.CERTBOT_ADMIN_EMAIL }}"
           }'
           
