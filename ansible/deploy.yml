@@ -1,7 +1,7 @@
 ---
 - hosts: all
   vars:
-    frontend_dir: /var/www/frontend
+    frontend_dir: /var/www/frontend/
 
   tasks:
     - name: Start deployment
@@ -15,12 +15,6 @@
             mode: '0755'
           become: yes
 
-        - name: Upload .env.production file
-          copy:
-            src: ./.env.production
-            dest: "{{ frontend_dir }}/.env.production"
-            mode: "0644"
-
         - name: Pull latest code and switch to main branch
           git:
             repo: "https://github.com/Calidris-Energet/frontend.git"
@@ -29,6 +23,12 @@
             version: main
             force: yes
           become: yes
+
+        - name: Upload .env.production file
+          copy:
+            src: ./.env.production
+            dest: "{{ frontend_dir }}/.env.production"
+            mode: "0644"
 
         - name: Install npm dependencies
           community.general.yarn:
