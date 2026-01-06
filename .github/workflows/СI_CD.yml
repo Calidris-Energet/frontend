@@ -152,7 +152,6 @@ jobs:
             "server_user": "${{ secrets.SERVER_USER }}",
             "telegram_chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
             "telegram_bot_token": "${{ secrets.TELEGRAM_TOKEN }}",
-            "telegram_topic_id": "${{ secrets.TELEGRAM_TOPIC_ID }}",
-            "certbot_admin_email": "${{ secrets.CERTBOT_ADMIN_EMAIL }}"
+            "telegram_topic_id": "${{ secrets.TELEGRAM_TOPIC_ID }}"
           }'
           

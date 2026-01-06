@@ -15,6 +15,12 @@
             mode: '0755'
           become: yes
 
+        - name: Upload .env.production file
+          copy:
+            src: ./.env.production
+            dest: "{{ frontend_dir }}/.env.production"
+            mode: "0644"
+
         - name: Pull latest code and switch to main branch
           git:
             repo: "https://github.com/Calidris-Energet/frontend.git"
@@ -34,6 +40,14 @@
             cmd: yarn build
             chdir: "{{ frontend_dir }}"
 
+        - name: Check site accessibility
+          uri:
+            url: "https://energet.shop/"
+            return_content: yes
+            status_code: 200
+          register: site_check
+          ignore_errors: yes
+
         - name: Send notification to a specific Telegram topic
           community.general.telegram:
             token: "{{ telegram_bot_token }}"
@@ -44,6 +58,9 @@
               text: |
                 🔔 Frontend
                 ✅ Изменения успешно задеплоены
+                
+                🔗 Ссылка 🔗
+                https://energet.shop/
               parse_mode: 'markdown'
 
       rescue:
