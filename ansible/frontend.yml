@@ -77,7 +77,5 @@
                 *Сервер:* {{ inventory_hostname }}
                 *Время:* {{ ansible_date_time.time }}
                 *Задача:* {{ ansible_failed_task.name }}
-                
-                `Ошибка: {{ ansible_failed_result.msg | default('Unknown error') }}`
               parse_mode: 'markdown'
               disable_notification: false
