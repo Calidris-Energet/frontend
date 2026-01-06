@@ -2,7 +2,6 @@
 - hosts: all
   vars:
     frontend_dir: /var/www/frontend
-    nvm_dir: "/home/{{ ansible_user }}/.nvm"
 
   tasks:
     - name: Start deployment
