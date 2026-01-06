@@ -147,7 +147,7 @@ jobs:
       - name: Run Ansible playbook to deploy frontend
         working-directory: ansible
         run: |
-          ansible-playbook frontend.yml \
+          ansible-playbook deploy.yml \
             -e '{
             "server_host": "${{ secrets.SERVER_HOST }}",
             "server_port": "${{ secrets.SERVER_PORT }}",
