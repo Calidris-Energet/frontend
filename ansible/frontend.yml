@@ -74,8 +74,7 @@
               text: |
                 🔔 Frontend
                 ❌ *Произошла ошибка при деплое*
-                *Сервер:* {{ inventory_hostname }}
-                *Время:* {{ ansible_date_time.time }}
+                *Время:* {{ ansible_facts['date_time']['time'] }}
                 *Задача:* {{ ansible_failed_task.name }}
               parse_mode: 'markdown'
               disable_notification: false
