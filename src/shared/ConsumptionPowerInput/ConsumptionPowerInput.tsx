@@ -1,11 +1,19 @@
 import { Stack, TextField, Typography } from "@mui/material";
 import { debounce } from "lodash";
-import { useEffect, useRef } from "react";
+import { FC, useEffect, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 const COEFFICIENT = 0.024;
 
-export const ConsumptionPowerInput = ({ value, setPower, label }) => {
+type Props = {
+    value: number;
+    setPower: (newPower: number) => void;
+    label: string;
+};
+
+export const ConsumptionPowerInput: FC<Props> = (props) => {
+    const { value, setPower, label } = props;
+
     const { control, setValue } = useForm({
         defaultValues: {
             watts: value,
@@ -28,13 +36,16 @@ export const ConsumptionPowerInput = ({ value, setPower, label }) => {
         setValue("watts", Math.round(kwh / COEFFICIENT));
     };
 
-    const updateStoreValue = (value: number) => {
-        if (wattsValue !== value) {
-            setPower(wattsValue);
-        }
+    const updateStoreValue = (newWattsValue: number) => {
+        setPower(newWattsValue);
     };
 
-    const throttled = useRef(debounce(updateStoreValue, 250));
+    const throttled = useRef(
+        debounce((value: number) => {
+            updateStoreValue(value);
+        }, 250)
+    );
+
     useEffect(() => throttled.current(wattsValue), [wattsValue]);
 
     return (

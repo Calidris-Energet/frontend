@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { Stack } from "@mui/material";
 import { updateConsumptionSeasons } from "entities/Configurator/lib/slices/configuratorSlice.ts";
 import { getConsumptionSeasons } from "entities/Configurator/model/selectors/getConsumption.ts";
@@ -19,37 +17,37 @@ export const ConsumptionSeasons = () => {
             <ConsumptionPowerInput
                 label="Зима"
                 value={consumption[0]}
-                setValue={(newValue) => {
-                    const newConsumption = [...consumption];
-                    newConsumption[0] = newValue;
-                    dispatch(updateConsumptionSeasons(newConsumption));
-                }}
-            />
-            <ConsumptionPowerInput
-                label="Лето"
-                value={consumption[1]}
-                setValue={(newValue) => {
-                    const newConsumption = [...consumption];
-                    newConsumption[1] = newValue;
-                    dispatch(updateConsumptionSeasons(newConsumption));
+                setPower={(newValue) => {
+                    dispatch(
+                        updateConsumptionSeasons({ value: newValue, index: 0 })
+                    );
                 }}
             />
             <ConsumptionPowerInput
                 label="Весна"
                 value={consumption[2]}
-                setValue={(newValue) => {
-                    const newConsumption = [...consumption];
-                    newConsumption[2] = newValue;
-                    dispatch(updateConsumptionSeasons(newConsumption));
+                setPower={(newValue) => {
+                    dispatch(
+                        updateConsumptionSeasons({ value: newValue, index: 1 })
+                    );
+                }}
+            />
+            <ConsumptionPowerInput
+                label="Лето"
+                value={consumption[1]}
+                setPower={(newValue) => {
+                    dispatch(
+                        updateConsumptionSeasons({ value: newValue, index: 2 })
+                    );
                 }}
             />
             <ConsumptionPowerInput
                 label="Осень"
                 value={consumption[3]}
-                setValue={(newValue) => {
-                    const newConsumption = [...consumption];
-                    newConsumption[3] = newValue;
-                    dispatch(updateConsumptionSeasons(newConsumption));
+                setPower={(newValue) => {
+                    dispatch(
+                        updateConsumptionSeasons({ value: newValue, index: 3 })
+                    );
                 }}
             />
         </Stack>
