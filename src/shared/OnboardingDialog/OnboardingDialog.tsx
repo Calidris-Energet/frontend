@@ -1,4 +1,3 @@
-// shared/components/OnboardingDialog/OnboardingDialog.tsx
 import {
     Dialog,
     DialogTitle,
@@ -11,6 +10,80 @@ import {
 } from "@mui/material";
 import { OnboardingStepContent } from "src/shared/OnboardingSteps/OnboardingSteps";
 
+interface OnboardingContentProps {
+    content: OnboardingStepContent;
+}
+
+const OnboardingContent = ({ content }: OnboardingContentProps) => {
+    const {
+        description,
+        image,
+        steps = []
+    } = content;
+
+    return (
+        <Stack spacing={3}>
+            {/* Картинка */}
+            {image && (
+                <Box 
+                    sx={{ 
+                        width: '100%', 
+                        height: 200, 
+                        backgroundImage: `url(${image})`,
+                        backgroundSize: 'contain',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundColor: '#f5f5f5',
+                        borderRadius: 1
+                    }}
+                />
+            )}
+
+            {/* Описание */}
+            {description && (
+                <Typography variant="body1">
+                    {description}
+                </Typography>
+            )}
+
+            {/* Шаги */}
+            {steps.length > 0 && (
+                <Box>
+                    <Typography variant="h6" gutterBottom>
+                        Шаги:
+                    </Typography>
+                    <Stack spacing={1}>
+                        {steps.map((stepText, index) => (
+                            <Box key={index} display="flex" alignItems="flex-start">
+                                <Typography 
+                                    variant="body2" 
+                                    sx={{ 
+                                        minWidth: 24, 
+                                        height: 24, 
+                                        borderRadius: '50%', 
+                                        backgroundColor: 'primary.main', 
+                                        color: 'white', 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center',
+                                        fontSize: '0.75rem',
+                                        mr: 1
+                                    }}
+                                >
+                                    {index + 1}
+                                </Typography>
+                                <Typography variant="body2">
+                                    {stepText}
+                                </Typography>
+                            </Box>
+                        ))}
+                    </Stack>
+                </Box>
+            )}
+        </Stack>
+    );
+};
+
 interface OnboardingDialogProps {
     open: boolean;
     onClose: () => void;
@@ -18,13 +91,9 @@ interface OnboardingDialogProps {
 }
 
 export const OnboardingDialog = ({ open, onClose, content }: OnboardingDialogProps) => {
-    // Значения по умолчанию вместо проверки на null
-    const {
-        title = "Онбординг",
-        description = "",
-        image = "",
-        steps = []
-    } = content || {};
+    if (!content) {
+        return null;
+    }
 
     return (
         <Dialog
@@ -34,68 +103,10 @@ export const OnboardingDialog = ({ open, onClose, content }: OnboardingDialogPro
             fullWidth
         >
             <DialogTitle>
-                {title}
+                {content.title || "Онбординг"}
             </DialogTitle>
             <DialogContent>
-                <Stack spacing={3}>
-                    {/* Картинка */}
-                    {image && (
-                        <Box 
-                            sx={{ 
-                                width: '100%', 
-                                height: 200, 
-                                backgroundImage: `url(${image})`,
-                                backgroundSize: 'contain',
-                                backgroundPosition: 'center',
-                                backgroundRepeat: 'no-repeat',
-                                backgroundColor: '#f5f5f5',
-                                borderRadius: 1
-                            }}
-                        />
-                    )}
-
-                    {/* Описание */}
-                    {description && (
-                        <Typography variant="body1">
-                            {description}
-                        </Typography>
-                    )}
-
-                    {/* Шаги */}
-                    {steps.length > 0 && (
-                        <Box>
-                            <Typography variant="h6" gutterBottom>
-                                Шаги:
-                            </Typography>
-                            <Stack spacing={1}>
-                                {steps.map((stepText, index) => (
-                                    <Box key={index} display="flex" alignItems="flex-start">
-                                        <Typography 
-                                            variant="body2" 
-                                            sx={{ 
-                                                minWidth: 24, 
-                                                height: 24, 
-                                                borderRadius: '50%', 
-                                                backgroundColor: 'primary.main', 
-                                                color: 'white', 
-                                                display: 'flex', 
-                                                alignItems: 'center', 
-                                                justifyContent: 'center',
-                                                fontSize: '0.75rem',
-                                                mr: 1
-                                            }}
-                                        >
-                                            {index + 1}
-                                        </Typography>
-                                        <Typography variant="body2">
-                                            {stepText}
-                                        </Typography>
-                                    </Box>
-                                ))}
-                            </Stack>
-                        </Box>
-                    )}
-                </Stack>
+                <OnboardingContent content={content} />
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>
