@@ -1,0 +1,32 @@
+---
+- hosts: all
+  tasks:
+    - name: Install NGINX
+      apt:
+        name: nginx
+        state: present
+
+    - name: Copy nginx configuration file to remote server
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/nginx.conf"
+        dest: /etc/nginx/nginx.conf
+        mode: '0644'
+      notify: reload nginx
+
+    - name: Test nginx configuration
+      ansible.builtin.command: nginx -t
+      register: nginx_test
+      changed_when: false
+      failed_when: nginx_test.rc != 0
+      tags: test
+
+    - name: Reload nginx to apply new configuration
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
+
+  handlers:
+    - name: reload nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded

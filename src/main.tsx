@@ -7,12 +7,16 @@ import { BrowserRouter } from "react-router-dom";
 import { StoreProvider } from "src/app/providers/StoreProvider";
 import App from "./app/App.tsx";
 
-VKID.Config.init({
-    app: import.meta.env.VITE_VK_SDK_APP_ID,
-    redirectUrl: import.meta.env.VITE_VK_ID_REDIRECT_URL,
-    scope: "email",
-    responseMode: VKID.ConfigResponseMode.Callback,
-});
+const isCypress = window.Cypress;
+
+if (!isCypress) {
+    VKID.Config.init({
+        app: import.meta.env.VITE_VK_SDK_APP_ID,
+        redirectUrl: import.meta.env.VITE_VK_ID_REDIRECT_URL,
+        scope: "email",
+        responseMode: VKID.ConfigResponseMode.Callback,
+    });
+}
 
 const root = createRoot(document.getElementById("root")!);
 

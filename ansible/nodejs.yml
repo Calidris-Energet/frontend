@@ -1,0 +1,57 @@
+---
+- hosts: all
+  become: yes
+  vars:
+    nodejs_version: 24
+
+  tasks:
+    - name: Удаляем старый список пакетов Node.js (если есть)
+      file:
+        path: /etc/apt/sources.list.d/nodesource.list
+        state: absent
+
+    - name: Удаляем старую версию Node.js
+      apt:
+        name:
+          - nodejs
+          - npm
+        state: absent
+        purge: yes
+      ignore_errors: yes
+
+    - name: Installing Nodejs
+      get_url:
+        url: "https://deb.nodesource.com/setup_{{ nodejs_version }}.x"
+        dest: ~/nodejs
+        mode: 0755
+        force: yes
+
+    - name: Nodejs Package
+      command: ~/nodejs
+      args:
+        creates: /etc/apt/sources.list.d/nodesource.list
+
+    - name: Yarn GPG
+      apt_key:
+        url: https://dl.yarnpkg.com/debian/pubkey.gpg
+        state: present
+
+    - name: Importing Yarn Package
+      copy:
+        content: "deb https://dl.yarnpkg.com/debian/ stable main"
+        dest: /etc/apt/sources.list.d/yarn.list
+
+    - name: Installing Nodejs + Yarn
+      apt:
+        name:
+          - nodejs
+          - yarn
+        update_cache: true
+
+    - name: Проверяем версию Node.js
+      command: node --version
+      register: node_version
+
+    - name: Выводим установленную версию
+      debug:
+        msg: "Установлена Node.js {{ node_version.stdout }}"

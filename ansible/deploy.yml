@@ -1,0 +1,80 @@
+---
+- hosts: all
+  vars:
+    frontend_dir: /var/www/frontend/
+
+  tasks:
+    - name: Start deployment
+      block:
+        - name: Ensure front folder exists
+          file:
+            path: "{{ frontend_dir }}"
+            state: directory
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+            mode: '0755'
+          become: yes
+
+        - name: Pull latest code and switch to main branch
+          git:
+            repo: "https://github.com/Calidris-Energet/frontend.git"
+            dest: "{{ frontend_dir }}"
+            update: yes
+            version: main
+            force: yes
+          become: yes
+
+        - name: Upload .env.production file
+          copy:
+            src: ./.env.production
+            dest: "{{ frontend_dir }}/.env.production"
+            mode: "0644"
+
+        - name: Install npm dependencies
+          community.general.yarn:
+            path: "{{ frontend_dir }}"
+            state: present
+
+        - name: Run the build script
+          ansible.builtin.command:
+            cmd: yarn build
+            chdir: "{{ frontend_dir }}"
+
+        - name: Check site accessibility
+          uri:
+            url: "https://energet.shop/"
+            return_content: yes
+            status_code: 200
+          register: site_check
+          ignore_errors: yes
+
+        - name: Send notification to a specific Telegram topic
+          community.general.telegram:
+            token: "{{ telegram_bot_token }}"
+            api_method: 'sendMessage'
+            api_args:
+              chat_id: "{{ telegram_chat_id }}"
+              message_thread_id: "{{ telegram_topic_id }}"
+              text: |
+                🔔 Frontend
+                ✅ Изменения успешно задеплоены
+                
+                🔗 Ссылка 🔗
+                https://energet.shop/
+              parse_mode: 'markdown'
+
+      rescue:
+        - name: Send failure notification to Telegram
+          community.general.telegram:
+            token: "{{ telegram_bot_token }}"
+            api_method: 'sendMessage'
+            api_args:
+              chat_id: "{{ telegram_chat_id }}"
+              message_thread_id: "{{ telegram_topic_id }}"
+              text: |
+                🔔 Frontend
+                ❌ *Произошла ошибка при деплое*
+                *Время:* {{ ansible_facts['date_time']['time'] }}
+                *Задача:* {{ ansible_failed_task.name }}
+              parse_mode: 'markdown'
+              disable_notification: false

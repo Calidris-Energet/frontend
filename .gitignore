@@ -24,3 +24,10 @@ dist-ssr
 *.sw?
 
 .env.production
+
+allure-results
+cypress/results
+
+ansible/ansible-password.txt
+ansible/.env
+ansible/.env.production

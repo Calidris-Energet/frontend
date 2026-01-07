@@ -57,9 +57,21 @@ export const Profile = () => {
                     mb: 3,
                 }}
             >
-                <TextField label="Имя" value={user.name} />
-                <TextField label="Телефон" value={user.phone} />
-                <TextField label="Почта" value={user.email} />
+                <TextField
+                    label="Имя"
+                    value={user.name}
+                    id="profile-name-field"
+                />
+                <TextField
+                    label="Телефон"
+                    value={user.phone}
+                    id="profile-phone-field"
+                />
+                <TextField
+                    label="Почта"
+                    value={user.email}
+                    id="profile-email-field"
+                />
             </Box>
             {/*<Box sx={{ display: "flex", gap: "10px" }}>*/}
             {/*    <Button onClick={handleSaveProfile} variant="contained">*/}

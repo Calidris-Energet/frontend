@@ -1,9 +1,11 @@
 services:
   nginx:
-    container_name: frontend-prod
+    container_name: frontend
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+      - "8111:80"
     environment:
       NODE_ENV: production
     networks:

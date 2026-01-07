@@ -30,10 +30,12 @@ const RegisterPage = () => {
 
     useVKID(vkidButtonRef);
 
+    const isCypress = window.Cypress;
+
     return (
         <Container maxWidth="xs" sx={{ pt: 8 }}>
             <RegisterForm onSubmit={onSubmit} />
-            <Box ref={vkidButtonRef} sx={{ mt: 2 }} />
+            {!isCypress && <Box ref={vkidButtonRef} sx={{ mt: 2 }} />}
         </Container>
     );
 };

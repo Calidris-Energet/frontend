@@ -50,8 +50,13 @@ const LoginForm = (props: Props) => {
                     })}
                     error={!!errors.email}
                     helperText={errors.email?.message}
+                    id="email-field"
                 />
-                <PasswordInput register={register} error={errors.password} />
+                <PasswordInput
+                    register={register}
+                    error={errors.password}
+                    id="password-field"
+                />
                 <Button
                     type="submit"
                     variant="contained"
