@@ -10,7 +10,9 @@ import {
     StepButton,
     Stepper,
     Typography,
+    IconButton,
 } from "@mui/material";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import {
     calculateFetch,
     resetConfigurator,
@@ -26,11 +28,15 @@ import { Consumption } from "src/widgets/Consumption/Consumption.tsx";
 import { CoordsPicker } from "src/widgets/CoordsPicker/CoordsPicker.tsx";
 import { Optimization } from "src/widgets/Optimization/Optimization.tsx";
 import { TabPanel } from "src/widgets/TabPanel/TabPanel.tsx";
+import { OnboardingDialog } from "src/shared/OnboardingDialog/OnboardingDialog.tsx";
+import { onboardingSteps } from "src/shared/OnboardingSteps/OnboardingSteps";
 
 export const ConfiguratorPage = () => {
-    const steps = ["Локация", "Потребление", "Оптимизация", "Результат"];
+    const steps = onboardingSteps;
 
     const [step, setStep] = useState(0);
+    const [onboardingOpen, setOnboardingOpen] = useState(false);
+    const [currentOnboardingStep, setCurrentOnboardingStep] = useState(0);
 
     const { loading, items } = useAppSelector(
         (state) => state.configuratorReducer
@@ -65,6 +71,15 @@ export const ConfiguratorPage = () => {
         navigate("/");
         dispatch(resetConfigurator());
         setStep(0);
+    };
+
+    const handleOpenOnboarding = (stepIndex) => {
+        setCurrentOnboardingStep(stepIndex);
+        setOnboardingOpen(true);
+    };
+
+    const handleCloseOnboarding = () => {
+        setOnboardingOpen(false);
     };
 
     const isLastStep = step == 3;
@@ -113,13 +128,6 @@ export const ConfiguratorPage = () => {
         );
     }
 
-    // const saveToDraft = async () => {
-    //     navigate("/");
-    //     await dispatch(saveDraftCalculation());
-    //     dispatch(resetConfigurator());
-    //     setStep(0);
-    // };
-
     const nextStepBtnVisible = !isLastStep;
 
     return (
@@ -127,21 +135,30 @@ export const ConfiguratorPage = () => {
             <Stack gap={10} width="100%">
                 <Box width="100%">
                     <Stepper nonLinear activeStep={step} width="100%">
-                        {steps.map((label, index) => {
+                        {steps.map((stepItem, index) => {
                             return (
-                                <Step key={label}>
-                                    <StepButton
-                                        onClick={() => handleStep(index)}
-                                    >
-                                        {label}
-                                    </StepButton>
+                                <Step key={stepItem.label}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <StepButton
+                                            onClick={() => handleStep(index)}
+                                        >
+                                            {stepItem.label}
+                                        </StepButton>
+                                        <IconButton 
+                                            size="small" 
+                                            sx={{ ml: 0.5 }}
+                                            onClick={() => handleOpenOnboarding(index)}
+                                        >
+                                            <HelpOutlineIcon fontSize="small" />
+                                        </IconButton>
+                                    </Box>
                                 </Step>
                             );
                         })}
                     </Stepper>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
-                    <Box>
+                    <Box sx={{ position: 'relative', width: '100%' }}>
                         <TabPanel currentTab={step} index={0}>
                             <CoordsPicker />
                         </TabPanel>
@@ -171,6 +188,12 @@ export const ConfiguratorPage = () => {
                     </Box>
                 </Box>
             </Stack>
+
+            <OnboardingDialog
+                open={onboardingOpen}
+                onClose={handleCloseOnboarding}
+                content={steps[currentOnboardingStep]?.onboardingContent}
+            />
         </Container>
     );
 };
