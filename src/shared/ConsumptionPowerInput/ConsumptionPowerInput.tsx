@@ -14,7 +14,7 @@ type Props = {
 export const ConsumptionPowerInput: FC<Props> = (props) => {
     const { value, setPower, label } = props;
 
-    const { control, setValue } = useForm({
+    const { control, setValue, getValues } = useForm({
         defaultValues: {
             watts: value,
             kwh: Number((value * COEFFICIENT).toFixed(2)),
@@ -36,17 +36,14 @@ export const ConsumptionPowerInput: FC<Props> = (props) => {
         setValue("watts", Math.round(kwh / COEFFICIENT));
     };
 
-    const updateStoreValue = (newWattsValue: number) => {
-        setPower(newWattsValue);
+    const updateStoreValue = () => {
+        const currentWatts = getValues("watts");
+        setPower(currentWatts);
     };
 
-    const throttled = useRef(
-        debounce((value: number) => {
-            updateStoreValue(value);
-        }, 250)
-    );
+    const throttled = useRef(debounce(updateStoreValue, 250));
 
-    useEffect(() => throttled.current(wattsValue), [wattsValue]);
+    useEffect(() => throttled.current(), [wattsValue]);
 
     return (
         <Stack gap={3}>
