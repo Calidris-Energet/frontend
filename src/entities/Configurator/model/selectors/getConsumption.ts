@@ -11,3 +11,6 @@ export const getConsumptionSeasons = (state: RootState): number[] =>
 
 export const getConsumptionMonth = (state: RootState): number[] =>
     state.configuratorReducer.configuration.consumptionMonth;
+
+export const getConsumptionWinterSummer = (state: RootState): number[] =>
+    state.configuratorReducer.configuration.consumptionWinterSummer;

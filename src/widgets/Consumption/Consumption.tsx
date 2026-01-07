@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import {
     FormControl,
     FormControlLabel,
@@ -13,7 +11,9 @@ import { useSelector } from "react-redux";
 import { useAppDispatch } from "src/app/providers/StoreProvider/hooks/hooks.ts";
 import { ConsumptionConstant } from "src/widgets/Consumption/ConsumptionConstant/ConsumptionConstant.tsx";
 import { ConsumptionSeasons } from "src/widgets/Consumption/ConsumptionSeasons/ConsumptionSeasons.tsx";
+import { ConsumptionWinterSummer } from "src/widgets/Consumption/ConsumptionWinterSummer/ConsumptionWinterSummer.tsx";
 import { TabPanel } from "src/widgets/TabPanel/TabPanel.tsx";
+import { ConsumptionMonth } from "./ConsumptionMonth/ConsumptionMonth";
 
 export const Consumption = () => {
     const consumptionType = useSelector(getConsumptionType);
@@ -47,6 +47,7 @@ export const Consumption = () => {
                     {/*<TabPanel currentTab={consumptionType} index={0}>*/}
                     {/*    <ConsumptionTemplate />*/}
                     {/*</TabPanel>*/}
+
                     <FormControlLabel
                         value={1}
                         control={<Radio />}
@@ -55,22 +56,33 @@ export const Consumption = () => {
                     <TabPanel currentTab={consumptionType} index={1}>
                         <ConsumptionConstant />
                     </TabPanel>
+
                     <FormControlLabel
                         value={2}
                         control={<Radio />}
-                        label="Потребление по сезоннам"
+                        label="Зимнее и летнее потребление"
                     />
                     <TabPanel currentTab={consumptionType} index={2}>
+                        <ConsumptionWinterSummer />
+                    </TabPanel>
+
+                    <FormControlLabel
+                        value={3}
+                        control={<Radio />}
+                        label="Потребление по сезонам"
+                    />
+                    <TabPanel currentTab={consumptionType} index={3}>
                         <ConsumptionSeasons />
                     </TabPanel>
-                    {/*<FormControlLabel*/}
-                    {/*    value={3}*/}
-                    {/*    control={<Radio />}*/}
-                    {/*    label="Потребление по месяцам"*/}
-                    {/*/>*/}
-                    {/*<TabPanel currentTab={consumptionType} index={3}>*/}
-                    {/*    /!*<ConsumptionMonth />*!/*/}
-                    {/*</TabPanel>*/}
+
+                    <FormControlLabel
+                        value={4}
+                        control={<Radio />}
+                        label="Потребление по месяцам"
+                    />
+                    <TabPanel currentTab={consumptionType} index={4}>
+                        <ConsumptionMonth />
+                    </TabPanel>
                 </RadioGroup>
             </FormControl>
         </div>

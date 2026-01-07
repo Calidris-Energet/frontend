@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { Box } from "@mui/material";
 import { updateConsumptionConst } from "entities/Configurator/lib/slices/configuratorSlice.ts";
 import { getConsumptionConst } from "entities/Configurator/model/selectors/getConsumption.ts";
@@ -18,7 +16,11 @@ export const ConsumptionConstant = () => {
 
     return (
         <Box p={3}>
-            <ConsumptionPowerInput value={consumption} setPower={setPower} />
+            <ConsumptionPowerInput
+                value={consumption}
+                setPower={setPower}
+                label={""}
+            />
         </Box>
     );
 };

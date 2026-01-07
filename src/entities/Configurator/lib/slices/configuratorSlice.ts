@@ -1,11 +1,16 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AsyncThunkConfig } from "@reduxjs/toolkit/src/createAsyncThunk.ts";
-import { AxiosResponse } from "axios";
+import { getConfiguration } from "entities/Configurator/model/selectors/getConfiguration.ts";
+import {
+    getConsumptionConst,
+    getConsumptionMonth,
+    getConsumptionSeasons,
+    getConsumptionType,
+    getConsumptionWinterSummer,
+} from "entities/Configurator/model/selectors/getConsumption.ts";
 import { T_Item } from "entities/Item/model/types/Item.ts";
 import { DEFAULT_COORDS } from "shared/utils/consts.ts";
 import { api } from "src/app/api.ts";
+import { AppThunkConfig } from "src/app/providers/StoreProvider/model/types.ts";
 
 export type T_ConfigurationResultItem = {
     item: T_Item;
@@ -26,6 +31,7 @@ export type T_Configuration = {
     consumptionConst: number;
     consumptionSeasons: number[];
     consumptionMonth: number[];
+    consumptionWinterSummer: [number, number];
     enSource: {
         solar: 0 | 1;
         wind: 0 | 1;
@@ -66,8 +72,9 @@ const initialState: IState = {
         coords: DEFAULT_COORDS,
         consumptionType: 1,
         consumptionConst: 100,
+        consumptionWinterSummer: [100, 100],
         consumptionSeasons: [100, 100, 100, 100],
-        consumptionMonth: [],
+        consumptionMonth: Array.from<number>({ length: 12 }).fill(100),
         enSource: {
             solar: 1, // солнечная панель
             wind: 0, // ветрогенератор
@@ -92,7 +99,7 @@ const initialState: IState = {
 export const saveDraftCalculation = createAsyncThunk<
     void,
     void,
-    AsyncThunkConfig
+    AppThunkConfig
 >("save_draft_configurator", async function (_, thunkAPI) {
     const state = thunkAPI.getState();
 
@@ -126,7 +133,7 @@ export const saveDraftCalculation = createAsyncThunk<
 export const deleteDraftConfigurator = createAsyncThunk<
     T_Configuration[],
     string,
-    AsyncThunkConfig
+    AppThunkConfig
 >("delete_configurator_draft", async function (draft_id) {
     const response = await api.delete(`/drafts/${draft_id}`);
 
@@ -136,14 +143,9 @@ export const deleteDraftConfigurator = createAsyncThunk<
 export const fetchConfiguratorDrafts = createAsyncThunk<
     T_Configuration[],
     void,
-    AsyncThunkConfig
->("fetch_configurator_drafts", async function (_, thunkAPI) {
-    const state = thunkAPI.getState();
-
-    const response = (await api.get(
-        "/drafts/",
-        state.configuration
-    )) as AxiosResponse<T_Configuration[]>;
+    AppThunkConfig
+>("fetch_configurator_drafts", async function () {
+    const response = await api.get<T_Configuration[]>("/drafts/");
 
     return response.data;
 });
@@ -151,31 +153,38 @@ export const fetchConfiguratorDrafts = createAsyncThunk<
 export const calculateFetch = createAsyncThunk<
     T_ConfigurationResult,
     void,
-    AsyncThunkConfig
+    AppThunkConfig
 >("calculate_configurator", async function (_, thunkAPI) {
     thunkAPI.dispatch(updateLoading(true));
 
     const state = thunkAPI.getState();
-
-    const configuration = state.configuratorReducer.configuration;
+    const configuration = getConfiguration(state);
 
     const getConsumption = () => {
-        if (configuration.consumptionType == 1) {
+        const consumptionType = getConsumptionType(state);
+
+        if (consumptionType == 1) {
             return {
                 name: "Постоянное потребление",
-                value: configuration.consumptionConst,
+                value: getConsumptionConst(state),
                 type: "Классика",
             };
-        } else if (configuration.consumptionType == 2) {
+        } else if (consumptionType == 2) {
             return {
                 name: "Зимнее и летнее потребление",
-                value: configuration.consumptionSeasons,
+                value: getConsumptionWinterSummer(state),
                 type: "Классика",
             };
-        } else if (configuration.consumptionType == 3) {
+        } else if (consumptionType == 3) {
+            return {
+                name: "Потребление по сезоннам",
+                value: getConsumptionSeasons(state),
+                type: "Классика",
+            };
+        } else if (consumptionType == 4) {
             return {
                 name: "Потребление по месяцам",
-                value: configuration.consumptionMonth,
+                value: getConsumptionMonth(state),
                 type: "Классика",
             };
         }
@@ -205,11 +214,26 @@ const configuratorSlice = createSlice({
         updateConsumptionConst: (state: IState, action) => {
             state.configuration.consumptionConst = action.payload;
         },
-        updateConsumptionSeasons: (state: IState, action) => {
-            state.configuration.consumptionSeasons = action.payload;
+        updateConsumptionWinterSummer: (
+            state: IState,
+            action: PayloadAction<{ value: number; index: number }>
+        ) => {
+            const { value, index } = action.payload;
+            state.configuration.consumptionWinterSummer[index] = value;
         },
-        updateConsumptionMonth: (state: IState, action) => {
-            state.configuration.consumptionMonth = action.payload;
+        updateConsumptionSeasons: (
+            state: IState,
+            action: PayloadAction<{ value: number; index: number }>
+        ) => {
+            const { value, index } = action.payload;
+            state.configuration.consumptionSeasons[index] = value;
+        },
+        updateConsumptionMonth: (
+            state: IState,
+            action: PayloadAction<{ value: number; index: number }>
+        ) => {
+            const { value, index } = action.payload;
+            state.configuration.consumptionMonth[index] = value;
         },
         updateEnSource: (state: IState, action) => {
             state.configuration.enSource = action.payload;
@@ -301,6 +325,7 @@ export const {
     updateConsumptionConst,
     updateConsumptionSeasons,
     updateConsumptionMonth,
+    updateConsumptionWinterSummer,
     updateEnSource,
     updateEnDSource,
     updateEnStorage,

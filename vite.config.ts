@@ -8,7 +8,7 @@ export default ({ mode }: ConfigEnv) => {
     return defineConfig({
         base: "/",
         server: {
-            port: 3000,
+            port: 80,
             host: true,
             proxy: {
                 "/api": {
