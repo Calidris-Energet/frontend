@@ -1,0 +1,11 @@
+---
+roles:
+  # Docker и зависимости
+  - name: geerlingguy.pip
+  - name: geerlingguy.docker
+
+  # Node.js
+  - name: geerlingguy.nodejs
+
+  # Certbot для SSL сертификатов
+  - name: geerlingguy.certbot

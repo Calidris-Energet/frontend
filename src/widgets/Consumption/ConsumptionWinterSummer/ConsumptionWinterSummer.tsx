@@ -15,7 +15,7 @@ export const ConsumptionWinterSummer = () => {
     return (
         <Stack p={3} gap={5}>
             <ConsumptionPowerInput
-                label="Зима"
+                label="Введите максимальное суточное потребление в зимний день"
                 value={consumption[0]}
                 setPower={(newValue) => {
                     dispatch(
@@ -27,7 +27,7 @@ export const ConsumptionWinterSummer = () => {
                 }}
             />
             <ConsumptionPowerInput
-                label="Лето"
+                label="Введите максимальное суточное потребление в летний день"
                 value={consumption[1]}
                 setPower={(newValue) => {
                     dispatch(

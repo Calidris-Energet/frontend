@@ -15,6 +15,12 @@
             mode: '0755'
           become: yes
 
+        - name: Ensure Git is installed
+          ansible.builtin.package:
+            name: git
+            state: present
+            update_cache: yes
+
         - name: Pull latest code and switch to main branch
           git:
             repo: "https://github.com/Calidris-Energet/frontend.git"

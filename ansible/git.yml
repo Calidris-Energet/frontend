@@ -1,0 +1,10 @@
+---
+- name: Install Git on all hosts
+  hosts: all
+  become: true  # This is needed to run tasks with root privileges
+  tasks:
+    - name: Ensure Git is installed
+      ansible.builtin.package:
+        name: git
+        state: present
+        update_cache: yes # Optional: update package cache before installing (useful for apt
