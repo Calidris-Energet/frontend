@@ -1,11 +1,14 @@
+import { FaroErrorBoundary } from "@grafana/faro-react";
 import { YMaps } from "@pbe/react-yandex-maps";
 import * as Sentry from "@sentry/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as VKID from "@vkid/sdk";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
+import ErrorFallback from "shared/ErrorFallback/ErrorFallback.tsx";
+import initFaro from "shared/monitoring";
 import { StoreProvider } from "src/app/providers/StoreProvider";
-import App from "./app/App.tsx";
+import { AppRouter } from "src/app/Router/AppRouter.tsx";
 
 const isCypress = window.Cypress;
 
@@ -32,14 +35,26 @@ if (
     });
 }
 
+initFaro();
+
 root.render(
-    <BrowserRouter basename="/">
+    <FaroErrorBoundary
+        fallback={(error, resetError) => (
+            <ErrorFallback error={error} resetErrorBoundary={resetError} />
+        )}
+    >
         <StoreProvider>
             <QueryClientProvider client={queryClient}>
-                <YMaps query={{ apikey: import.meta.env.VITE_YMAPS_API_KEY }}>
-                    <App />
+                <YMaps
+                    query={{
+                        apikey: import.meta.env.VITE_YMAPS_API_KEY,
+                    }}
+                >
+                    <BrowserRouter basename="/">
+                        <AppRouter />
+                    </BrowserRouter>
                 </YMaps>
             </QueryClientProvider>
         </StoreProvider>
-    </BrowserRouter>
+    </FaroErrorBoundary>
 );

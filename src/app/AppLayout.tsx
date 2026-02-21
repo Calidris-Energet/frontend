@@ -5,17 +5,17 @@ import { getIsAuthenticated } from "entities/User/model/selectors/getUser.ts";
 import getIsBuyer from "entities/User/model/selectors/isBuyer.ts";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { Outlet } from "react-router-dom";
 import {
     useAppDispatch,
     useAppSelector,
 } from "src/app/providers/StoreProvider/hooks/hooks.ts";
-import { AppRouter } from "src/app/Router/AppRouter.tsx";
-import Header from "src/widgets/Header/Header.tsx";
-import OnboardingModal from "src/widgets/OnboardingModal/OnboardingModal.tsx";
+import Header from "src/widgets/Header/Header";
+import OnboardingModal from "src/widgets/OnboardingModal/OnboardingModal";
 import { Reset } from "styled-reset";
 import styles from "./App.module.scss";
 
-function App() {
+export const AppLayout = () => {
     const isBuyer = useAppSelector(getIsBuyer);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -40,7 +40,7 @@ function App() {
 
     useEffect(() => {
         onAppStarted();
-    }, []);
+    }, [onAppStarted]);
 
     const isAuthenticated = useSelector(getIsAuthenticated);
 
@@ -65,12 +65,10 @@ function App() {
             ) : (
                 <div className={styles.root}>
                     <Header />
-                    <AppRouter />
+                    <Outlet />
                 </div>
             )}
             <OnboardingModal />
         </>
     );
-}
-
-export default App;
+};

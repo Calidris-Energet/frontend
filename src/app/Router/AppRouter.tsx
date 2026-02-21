@@ -1,3 +1,4 @@
+import { FaroRoutes } from "@grafana/faro-react";
 import { BinPage } from "pages/BinPage/BinPage.tsx";
 import { ConfiguratorPage } from "pages/ConfiguratorPage/ConfiguratorPage.tsx";
 import { FavouritesPage } from "pages/FavouritesPage/FavouritesPage.tsx";
@@ -10,7 +11,8 @@ import NotFoundPage from "pages/NotFoundPage/NotFoundPage.tsx";
 import { OrdersTablePage } from "pages/OrdersTablePage/OrdersTablePage.tsx";
 import { ProfilePage } from "pages/ProfilePage/ProfilePage.tsx";
 import RegisterPage from "pages/RegisterPage/RegisterPage.tsx";
-import { matchPath, Route, Routes, useLocation } from "react-router-dom";
+import { matchPath, Route, useLocation } from "react-router-dom";
+import { AppLayout } from "src/app/AppLayout.tsx";
 
 export const useRouteMatch = (patterns: readonly string[]) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -29,19 +31,21 @@ export const useRouteMatch = (patterns: readonly string[]) => {
 
 export const AppRouter = () => {
     return (
-        <Routes>
-            <Route path="/" element={<ItemsPage />} />
-            <Route path="/add_item" element={<ItemAddPage />} />
-            <Route path="/items/:id/edit" element={<ItemEditPage />} />
-            <Route path="/items/:id" element={<ItemPage />} />
-            <Route path="/login/" element={<LoginPage />} />
-            <Route path="/register/" element={<RegisterPage />} />
-            <Route path="/profile/" element={<ProfilePage />} />
-            <Route path="/configurator/" element={<ConfiguratorPage />} />
-            <Route path="/favourites/" element={<FavouritesPage />} />
-            <Route path="/bin/" element={<BinPage />} />
-            <Route path="/orders" element={<OrdersTablePage />} />
-            <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+        <FaroRoutes>
+            <Route element={<AppLayout />}>
+                <Route path="/" element={<ItemsPage />} />
+                <Route path="/add_item" element={<ItemAddPage />} />
+                <Route path="/items/:id/edit" element={<ItemEditPage />} />
+                <Route path="/items/:id" element={<ItemPage />} />
+                <Route path="/login/" element={<LoginPage />} />
+                <Route path="/register/" element={<RegisterPage />} />
+                <Route path="/profile/" element={<ProfilePage />} />
+                <Route path="/configurator/" element={<ConfiguratorPage />} />
+                <Route path="/favourites/" element={<FavouritesPage />} />
+                <Route path="/bin/" element={<BinPage />} />
+                <Route path="/orders" element={<OrdersTablePage />} />
+                <Route path="*" element={<NotFoundPage />} />
+            </Route>
+        </FaroRoutes>
     );
 };
