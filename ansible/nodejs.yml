@@ -3,7 +3,9 @@
   become: yes
   vars:
     nodejs_version: 24
-
+  vars_files:
+    - .ansible-env.yml.vault
+    
   tasks:
     - name: Удаляем старый список пакетов Node.js (если есть)
       file:

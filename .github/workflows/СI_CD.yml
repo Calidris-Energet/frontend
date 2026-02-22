@@ -132,10 +132,10 @@ jobs:
       - name: Decrypt the rest of ansible vault files
         working-directory: ansible
         run: |
-          ansible-vault view ssh-key.pem.vault --vault-password-file=ansible-password.txt > ssh-key.pem
+          ansible-vault view ssh-key.pem.vault > ssh-key.pem
           chmod 400 ssh-key.pem
           
-          ansible-vault view .env.production.vault --vault-password-file=ansible-password.txt > .env.production
+          ansible-vault view .env.production.vault > .env.production
 
       - name: Set up SSH
         run: |
@@ -147,13 +147,5 @@ jobs:
       - name: Run Ansible playbook to deploy frontend
         working-directory: ansible
         run: |
-          ansible-playbook deploy.yml \
-            -e '{
-            "server_host": "${{ secrets.SERVER_HOST }}",
-            "server_port": "${{ secrets.SERVER_PORT }}",
-            "server_user": "${{ secrets.SERVER_USER }}",
-            "telegram_chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
-            "telegram_bot_token": "${{ secrets.TELEGRAM_TOKEN }}",
-            "telegram_topic_id": "${{ secrets.TELEGRAM_TOPIC_ID }}"
-          }'
+          ansible-playbook deploy.yml
           
