@@ -12,6 +12,7 @@ import { OrdersTablePage } from "pages/OrdersTablePage/OrdersTablePage.tsx";
 import { ProfilePage } from "pages/ProfilePage/ProfilePage.tsx";
 import RegisterPage from "pages/RegisterPage/RegisterPage.tsx";
 import { matchPath, Route, useLocation } from "react-router-dom";
+import ErrorThrower from "shared/ErrorThrower/ErrorThrower.tsx";
 import { AppLayout } from "src/app/AppLayout.tsx";
 
 export const useRouteMatch = (patterns: readonly string[]) => {
@@ -44,6 +45,7 @@ export const AppRouter = () => {
                 <Route path="/favourites/" element={<FavouritesPage />} />
                 <Route path="/bin/" element={<BinPage />} />
                 <Route path="/orders" element={<OrdersTablePage />} />
+                <Route path="/error" element={<ErrorThrower />} />
                 <Route path="*" element={<NotFoundPage />} />
             </Route>
         </FaroRoutes>

@@ -25,7 +25,7 @@ const initFaro = () => {
         app: {
             name: "frontend-app",
             version: "1.0.0",
-            environment: "development",
+            environment: process.env.NODE_ENV,
         },
         trackResources: true,
         trackGeolocation: true,
