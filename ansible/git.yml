@@ -1,6 +1,8 @@
 ---
 - name: Install Git on all hosts
   hosts: all
+  vars_files:
+  - .ansible-env.yml.vault
   become: true  # This is needed to run tasks with root privileges
   tasks:
     - name: Ensure Git is installed

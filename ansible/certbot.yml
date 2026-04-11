@@ -5,7 +5,9 @@
   vars:
     webroot_path: '/var/www/frontend'
     domain_name: energet.shop
-
+  vars_files:
+    - .ansible-env.yml.vault
+    
   tasks:
     - name: Install Certbot via snap (modern method)
       include_role:

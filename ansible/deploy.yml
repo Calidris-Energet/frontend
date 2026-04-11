@@ -2,7 +2,9 @@
 - hosts: all
   vars:
     frontend_dir: /var/www/frontend/
-
+  vars_files:
+    - .ansible-env.yml.vault
+    
   tasks:
     - name: Start deployment
       block:
