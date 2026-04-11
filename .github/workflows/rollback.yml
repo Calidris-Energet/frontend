@@ -31,11 +31,11 @@ jobs:
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
 
       - name: Test token permissions
-          env:
-            GH_TOKEN: ${{ secrets.PAT_TOKEN }}
-          run: |
-            gh auth status
-            gh repo view
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          gh auth status
+          gh repo view
 
       # Остальные шаги без изменений
       - name: Get last merged PR
