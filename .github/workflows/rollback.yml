@@ -16,26 +16,27 @@ jobs:
   revert_pr:
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}  # Используем PAT вместо GITHUB_TOKEN
     steps:
       - name: Checkout repository
         uses: actions/checkout@master
         with:
-          fetch-depth: 0  # Need full history for revert
+          fetch-depth: 0
           ref: main
+          token: ${{ secrets.PAT_TOKEN }}  # Используем PAT для checkout
 
       - name: Configure Git
         run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+      # Остальные шаги без изменений
       - name: Get last merged PR
         id: get_pr
         run: |
           if [ -n "${{ github.event.inputs.pr_number }}" ]; then
             PR_NUMBER="${{ github.event.inputs.pr_number }}"
           else
-            # Get the last merged PR to main
             PR_NUMBER=$(gh pr list --state merged --base main --limit 1 --json number --jq '.[0].number')
           fi
           
@@ -50,22 +51,17 @@ jobs:
       - name: Create revert branch and PR
         id: create_revert
         run: |
-          # Create a new branch for revert
           BRANCH_NAME="revert-branch-${{ steps.get_pr.outputs.pr_number }}-$(date +%s)"
           git checkout -b $BRANCH_NAME
           
-          # Get the merge commit SHA of the PR being reverted
           MERGE_COMMIT=$(gh pr view ${{ steps.get_pr.outputs.pr_number }} --json mergeCommit --jq '.mergeCommit.oid')
           
           echo "Merge commit: $MERGE_COMMIT"
           
-          # Revert the merge commit with -m 1 flag (mainline is the first parent)
           git revert -m 1 $MERGE_COMMIT --no-edit
           
-          # Push the branch
           git push origin $BRANCH_NAME
           
-          # Create the revert PR
           REVERT_PR_URL=$(gh pr create \
             --title "Revert PR #${{ steps.get_pr.outputs.pr_number }}" \
             --body "Auto-reverting PR #${{ steps.get_pr.outputs.pr_number }}" \
@@ -73,15 +69,12 @@ jobs:
             --head $BRANCH_NAME \
             --label revert)
           
-          # Extract PR number from URL
           REVERT_PR_NUMBER=$(echo $REVERT_PR_URL | grep -oE '[0-9]+$')
           echo "revert_pr_number=$REVERT_PR_NUMBER" >> $GITHUB_OUTPUT
           echo "Created revert PR #$REVERT_PR_NUMBER"
 
       - name: Merge Revert PR
         run: |
-          # Merge the revert PR
           gh pr merge ${{ steps.create_revert.outputs.revert_pr_number }} \
             --merge \
-            --delete-branch \
-            --subject "Merge revert PR #${{ steps.create_revert.outputs.revert_pr_number }}"
+            --delete-branch
