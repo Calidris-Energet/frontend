@@ -6,7 +6,6 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { Theme, useTheme } from "@mui/material/styles";
 import { T_ItemOption } from "entities/Item/model/types/Item.ts";
 
-
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -33,7 +32,12 @@ interface IProps {
     onChange: (value: string[]) => void;
 }
 
-export default function MultipleSelect({ label, options, value, onChange }: IProps) {
+export default function MultipleSelect({
+    label,
+    options,
+    value,
+    onChange,
+}: IProps) {
     const theme = useTheme();
 
     if (!options) {
@@ -41,13 +45,13 @@ export default function MultipleSelect({ label, options, value, onChange }: IPro
     }
 
     const handleChange = (event: SelectChangeEvent<string[]>) => {
-    const selectedValue = event.target.value;
-    if (Array.isArray(selectedValue)) {
-        onChange(selectedValue);
-    } else {
-        onChange([]);
-    }
-};
+        const selectedValue = event.target.value;
+        if (Array.isArray(selectedValue)) {
+            onChange(selectedValue);
+        } else {
+            onChange([]);
+        }
+    };
 
     return (
         <FormControl sx={{ m: 1, width: 300 }}>
@@ -67,11 +71,10 @@ export default function MultipleSelect({ label, options, value, onChange }: IPro
                         value={item.name}
                         style={getStyles(item.name, value, theme)}
                     >
-                        {item.name}
+                        {item.name}3
                     </MenuItem>
                 ))}
             </Select>
         </FormControl>
     );
 }
-
