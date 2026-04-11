@@ -1,6 +1,12 @@
 name: Rollback
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to revert (leave empty for last merged PR)'
+        required: false
+        type: number
 
 jobs:
   revert_pr:
@@ -11,14 +17,43 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@master
 
+      - name: Get last merged PR
+        id: get_pr
+        run: |
+          if [ -n "${{ github.event.inputs.pr_number }}" ]; then
+            PR_NUMBER="${{ github.event.inputs.pr_number }}"
+          else
+            # Get the last merged PR to master
+            PR_NUMBER=$(gh pr list --state merged --base master --limit 1 --json number --jq '.[0].number')
+          fi
+          
+          if [ -z "$PR_NUMBER" ]; then
+            echo "No merged PR found to revert"
+            exit 1
+          fi
+          
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "Will revert PR #$PR_NUMBER"
+
       - name: Create Revert PR
         id: create_revert
         run: |
-          # Create the revert PR and capture its number or URL
-          REVERT_URL=$(gh pr revert ${{ github.event.pull_request.number }} --body "Auto-reverting PR #${{ github.event.pull_request.number }}")
-          echo "revert_url=$REVERT_URL" >> $GITHUB_OUTPUT
+          # Create revert PR
+          gh pr create \
+            --title "Revert PR #${{ steps.get_pr.outputs.pr_number }}" \
+            --body "Auto-reverting PR #${{ steps.get_pr.outputs.pr_number }}" \
+            --base master \
+            --head revert-branch-${{ steps.get_pr.outputs.pr_number }} \
+            --label revert
+          
+          # Get the revert PR number
+          REVERT_PR=$(gh pr list --head revert-branch-${{ steps.get_pr.outputs.pr_number }} --json number --jq '.[0].number')
+          echo "revert_pr_number=$REVERT_PR" >> $GITHUB_OUTPUT
 
       - name: Merge Revert PR
         run: |
-          # Merge the newly created revert PR
-          gh pr merge ${{ steps.create_revert.outputs.revert_url }} --merge --delete-branch
+          # Merge the revert PR
+          gh pr merge ${{ steps.create_revert.outputs.revert_pr_number }} \
+            --merge \
+            --delete-branch \
+            --subject "Merge revert PR #${{ steps.create_revert.outputs.revert_pr_number }}"
