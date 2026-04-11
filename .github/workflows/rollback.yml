@@ -20,6 +20,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@master
+        with:
+          fetch-depth: 0  # Need full history for revert
+          ref: main
 
       - name: Get last merged PR
         id: get_pr
@@ -39,20 +42,34 @@ jobs:
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
           echo "Will revert PR #$PR_NUMBER"
 
-      - name: Create Revert PR
+      - name: Create revert branch and PR
         id: create_revert
         run: |
-          # Create revert PR
-          gh pr create \
+          # Create a new branch for revert
+          BRANCH_NAME="revert-branch-${{ steps.get_pr.outputs.pr_number }}-$(date +%s)"
+          git checkout -b $BRANCH_NAME
+          
+          # Get the merge commit SHA of the PR being reverted
+          MERGE_COMMIT=$(gh pr view ${{ steps.get_pr.outputs.pr_number }} --json mergeCommit --jq '.mergeCommit.oid')
+          
+          # Revert the merge commit
+          git revert $MERGE_COMMIT --no-edit
+          
+          # Push the branch
+          git push origin $BRANCH_NAME
+          
+          # Create the revert PR
+          REVERT_PR_URL=$(gh pr create \
             --title "Revert PR #${{ steps.get_pr.outputs.pr_number }}" \
             --body "Auto-reverting PR #${{ steps.get_pr.outputs.pr_number }}" \
             --base main \
-            --head revert-branch-${{ steps.get_pr.outputs.pr_number }} \
-            --label revert
+            --head $BRANCH_NAME \
+            --label revert)
           
-          # Get the revert PR number
-          REVERT_PR=$(gh pr list --head revert-branch-${{ steps.get_pr.outputs.pr_number }} --json number --jq '.[0].number')
-          echo "revert_pr_number=$REVERT_PR" >> $GITHUB_OUTPUT
+          # Extract PR number from URL
+          REVERT_PR_NUMBER=$(echo $REVERT_PR_URL | grep -oE '[0-9]+$')
+          echo "revert_pr_number=$REVERT_PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "Created revert PR #$REVERT_PR_NUMBER"
 
       - name: Merge Revert PR
         run: |
