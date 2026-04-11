@@ -1,0 +1,25 @@
+name: Rollback
+
+on:
+  workflow_dispatch:
+
+jobs:
+  revert_pr:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+
+      - name: Create Revert PR
+        id: create_revert
+        run: |
+          # Create the revert PR and capture its number or URL
+          REVERT_URL=$(gh pr revert ${{ github.event.pull_request.number }} --body "Auto-reverting PR #${{ github.event.pull_request.number }}" --yes)
+          echo "revert_url=$REVERT_URL" >> $GITHUB_OUTPUT
+
+      - name: Merge Revert PR
+        run: |
+          # Merge the newly created revert PR
+          gh pr merge ${{ steps.create_revert.outputs.revert_url }} --merge --delete-branch
