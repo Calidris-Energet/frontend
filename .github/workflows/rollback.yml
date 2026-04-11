@@ -24,6 +24,11 @@ jobs:
           fetch-depth: 0  # Need full history for revert
           ref: main
 
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Get last merged PR
         id: get_pr
         run: |
