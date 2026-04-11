@@ -118,7 +118,7 @@ const ItemsPage: React.FC = () => {
                         onChange={setName}
                         onIconClick={refetch}
                     />
-                    <Stack gap={2} direction="row" alignItems="center">
+                    <Stack gap={3} direction="row" alignItems="center">
                         <MultipleSelect
                             label="Категория1"
                             options={itemsTypes || []}
