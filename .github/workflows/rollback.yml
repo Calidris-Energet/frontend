@@ -15,7 +15,7 @@ jobs:
         id: create_revert
         run: |
           # Create the revert PR and capture its number or URL
-          REVERT_URL=$(gh pr revert ${{ github.event.pull_request.number }} --body "Auto-reverting PR #${{ github.event.pull_request.number }}" --yes)
+          REVERT_URL=$(gh pr revert ${{ github.event.pull_request.number }} --body "Auto-reverting PR #${{ github.event.pull_request.number }}")
           echo "revert_url=$REVERT_URL" >> $GITHUB_OUTPUT
 
       - name: Merge Revert PR
