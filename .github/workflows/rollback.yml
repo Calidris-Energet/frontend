@@ -31,13 +31,6 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Test token permissions
-        env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: |
-          gh auth status
-          gh repo view
-
       - name: Get last merged PR
         id: get_pr
         run: |
