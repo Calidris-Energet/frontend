@@ -25,6 +25,18 @@ jobs:
           ref: main
           token: ${{ secrets.PAT_TOKEN }}  # Используем PAT для checkout
 
+      - name: Configure Git
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Test token permissions
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          gh auth status
+          gh repo view
+
       # Остальные шаги без изменений
       - name: Get last merged PR
         id: get_pr
