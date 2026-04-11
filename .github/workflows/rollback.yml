@@ -23,8 +23,8 @@ jobs:
           if [ -n "${{ github.event.inputs.pr_number }}" ]; then
             PR_NUMBER="${{ github.event.inputs.pr_number }}"
           else
-            # Get the last merged PR to master
-            PR_NUMBER=$(gh pr list --state merged --base master --limit 1 --json number --jq '.[0].number')
+            # Get the last merged PR to main
+            PR_NUMBER=$(gh pr list --state merged --base main --limit 1 --json number --jq '.[0].number')
           fi
           
           if [ -z "$PR_NUMBER" ]; then
@@ -42,7 +42,7 @@ jobs:
           gh pr create \
             --title "Revert PR #${{ steps.get_pr.outputs.pr_number }}" \
             --body "Auto-reverting PR #${{ steps.get_pr.outputs.pr_number }}" \
-            --base master \
+            --base main \
             --head revert-branch-${{ steps.get_pr.outputs.pr_number }} \
             --label revert
           
