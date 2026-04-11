@@ -16,21 +16,18 @@ permissions:
 jobs:
   revert_pr:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@master
         with:
           fetch-depth: 0
           ref: main
-          token: ${{ secrets.PAT_TOKEN }}  # Используем PAT для checkout
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Configure Git
         run: |
-          echo "${{ github.actor }}"
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ secrets.GIT_USER_EMAIL }}"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Test token permissions
         env:
@@ -39,7 +36,6 @@ jobs:
           gh auth status
           gh repo view
 
-      # Остальные шаги без изменений
       - name: Get last merged PR
         id: get_pr
         run: |
