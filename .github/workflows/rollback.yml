@@ -8,6 +8,10 @@ on:
         required: false
         type: number
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   revert_pr:
     runs-on: ubuntu-latest
