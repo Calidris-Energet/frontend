@@ -52,8 +52,10 @@ jobs:
           # Get the merge commit SHA of the PR being reverted
           MERGE_COMMIT=$(gh pr view ${{ steps.get_pr.outputs.pr_number }} --json mergeCommit --jq '.mergeCommit.oid')
           
-          # Revert the merge commit
-          git revert $MERGE_COMMIT --no-edit
+          echo "Merge commit: $MERGE_COMMIT"
+          
+          # Revert the merge commit with -m 1 flag (mainline is the first parent)
+          git revert -m 1 $MERGE_COMMIT --no-edit
           
           # Push the branch
           git push origin $BRANCH_NAME
