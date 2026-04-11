@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 jobs:
   revert_pr:
@@ -23,7 +24,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: main
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}  # Используем PAT для checkout
 
       - name: Configure Git
         run: |
@@ -32,7 +33,7 @@ jobs:
 
       - name: Test token permissions
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           gh auth status
           gh repo view
