@@ -16,14 +16,14 @@ jobs:
   revert_pr:
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}  # Используем PAT вместо GITHUB_TOKEN
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@master
         with:
           fetch-depth: 0
           ref: main
-          token: ${{ secrets.PAT_TOKEN }}  # Используем PAT для checkout
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure Git
         run: |
@@ -32,7 +32,7 @@ jobs:
 
       - name: Test token permissions
         env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh auth status
           gh repo view
